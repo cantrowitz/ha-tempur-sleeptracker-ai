@@ -1,28 +1,54 @@
+"""Select platform for Tempur-Pedic Sleeptracker-AI."""
 from homeassistant.components.select import SelectEntity
-from .const import DOMAIN, WIND_DOWN_PROGRAMS, WIND_DOWN_MODES
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from .const import (
+    CONF_PROCESSOR_SERIAL,
+    DOMAIN,
+    WIND_DOWN_MODES,
+    WIND_DOWN_PROGRAMS,
+)
 from .entity import TempurPedicBaseEntity
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    data = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([
-        TempurPedicWindDownSelect(data["coordinator"], data["api"], entry.entry_id)
-    ])
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the Tempur-Pedic select platform."""
+    data = entry.runtime_data if hasattr(entry, "runtime_data") and entry.runtime_data else hass.data[DOMAIN][entry.entry_id]
+    api = data.api if hasattr(data, "api") else data["api"]
+    coordinator = data.coordinator if hasattr(data, "coordinator") else data["coordinator"]
+
+    async_add_entities([TempurPedicWindDownSelect(coordinator, api, entry)])
+
 
 class TempurPedicWindDownSelect(TempurPedicBaseEntity, SelectEntity):
-    _attr_name = "Wind Down Program"
+    """Select entity for active wind down program."""
+
+    _attr_name = "Wind down program"
+    _attr_icon = "mdi:bed-clock"
     _attr_options = ["Off"] + list(WIND_DOWN_PROGRAMS.keys())
 
-    def __init__(self, coordinator, api_client, entry_id: str):
-        super().__init__(coordinator, entry_id)
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        """Initialize the select entity."""
+        super().__init__(coordinator, entry)
         self._api = api_client
-        self._attr_unique_id = f"{entry_id}_wind_down_select"
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_wind_down_select"
 
     @property
     def current_option(self) -> str:
-        mode_id = self.coordinator.data.get("wind_down_mode", 0)
+        """Return currently selected wind down option."""
+        data = self.coordinator.data or {}
+        mode_id = data.get("wind_down_mode", 0)
         return WIND_DOWN_MODES.get(mode_id, "Off")
 
     async def async_select_option(self, option: str) -> None:
+        """Change the selected wind down option."""
         if option == "Off":
             await self._api.async_stop_wind_down()
         else:

@@ -1,12 +1,41 @@
+"""Constants for the Tempur-Pedic Sleeptracker-AI integration."""
+from homeassistant.const import Platform
+
 DOMAIN = "tempur_sleeptracker_ai"
 MANUFACTURER = "Tempur-Pedic"
-PLATFORMS = ["select", "button", "sensor", "cover", "light"]
 
-ENDPOINT_URL = "https://app.tsi.sleeptracker.com/actrack-client/v2/fpcsiot/processor/adjustableBaseControls"
+PLATFORMS: list[Platform] = [
+    Platform.COVER,
+    Platform.LIGHT,
+    Platform.SENSOR,
+    Platform.BINARY_SENSOR,
+    Platform.SELECT,
+    Platform.BUTTON,
+]
 
+# API Endpoints
+AUTH_URL = "https://auth.tsi.sleeptracker.com/v1/app/user/session"
+ENDPOINT_BASE_CONTROLS = "https://app.tsi.sleeptracker.com/actrack-client/v2/fpcsiot/processor/adjustableBaseControls"
+ENDPOINT_GET_BY_TYPE = "https://app.tsi.sleeptracker.com/actrack-client/v2/fpcsiot/processor/getByType"
+ENDPOINT_GET_ACTIVE = "https://app.tsi.sleeptracker.com/actrack-client/v2/fpcsiot/processor/getActiveSleeptracker"
+ENDPOINT_WEBUI = "https://app.tsi.sleeptracker.com/actrack-client/v2/actrack/webui"
+
+# Client Identifiers
+CLIENT_ID = "sleeptracker-android-tsi"
+CLIENT_VERSION = "H-3.6.2"
+
+# Bed Control Commands
+CMD_PRESET_ZERO_G = 0
+CMD_PRESET_FLAT = 2
+CMD_HEAD_DOWN = 107
+CMD_FOOT_UP = 108
+CMD_HEAD_UP = 110
+CMD_FOOT_DOWN = 113
+CMD_TOGGLE_LIGHT = 230
 CMD_POLL_STATUS = 500
-CMD_STOP_WIND_DOWN = 31
 
+# Wind Down Program Definitions
+CMD_STOP_WIND_DOWN = 31
 WIND_DOWN_PROGRAMS = {
     "Prepare for Sleep": {"command": 22, "mode_id": 32},
     "Destress in Bed": {"command": 21, "mode_id": 17},
@@ -17,3 +46,11 @@ WIND_DOWN_MODES = {
     17: "Destress in Bed",
     32: "Prepare for Sleep",
 }
+
+# Configuration Keys
+CONF_DEVICE_ID = "device_id"
+CONF_PROCESSOR_SERIAL = "processor_serial"
+CONF_BED_NAME = "bed_name"
+CONF_MODEL = "model"
+CONF_HEAD_TICKS = "head_ticks_per_degree"
+CONF_FOOT_TICKS = "foot_ticks_per_degree"
