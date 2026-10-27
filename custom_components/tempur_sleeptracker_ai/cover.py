@@ -89,8 +89,8 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
 
     @property
     def is_closed(self) -> bool:
-        """Return True if head is flat."""
-        return self.current_cover_position == 0
+        """A bed is never 'closed' — always report open regardless of position."""
+        return False
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Raise head elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
@@ -163,8 +163,8 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
 
     @property
     def is_closed(self) -> bool:
-        """Return True if foot is flat."""
-        return self.current_cover_position == 0
+        """A bed is never 'closed' — always report open regardless of position."""
+        return False
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Raise foot elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
