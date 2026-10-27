@@ -193,9 +193,22 @@ class TempurPedicApiClient:
 
         _LOGGER.debug("Raw bed status snapshot: %s", snapshot)
 
+        # Extract dynamic wind-down program list when the API returns it.
+        # The cloud may return a list like:
+        #   [{"name": "Prepare for Sleep", "command": 22, "modeId": 32}, ...]
+        # We normalise it to the same shape as the hardcoded WIND_DOWN_PROGRAMS
+        # constant so the select entity can use either source transparently.
+        raw_programs = snapshot.get("windDownPrograms", [])
+        dynamic_programs = {
+            prog["name"]: {"command": prog["command"], "mode_id": prog["modeId"]}
+            for prog in raw_programs
+            if "name" in prog and "command" in prog and "modeId" in prog
+        }
+
         return {
             "online": body.get("connectionStatus") == "online",
             "wind_down_mode": snapshot.get("windDownMode", 0),
+            "wind_down_programs": dynamic_programs,  # empty dict if API does not provide them
             "massage_frequency_hz": snapshot.get("massageFrequency", 0),
             "massage_timer_mins": snapshot.get("massageTimerMins", 0),
             "massage_timer_secs": snapshot.get("massageTimerSecs", 0),
@@ -301,21 +314,38 @@ class TempurPedicApiClient:
         """Toggle underbed / safety light (Command 230)."""
         return await self.async_send_command(CMD_TOGGLE_LIGHT, request_status=False)
 
-    async def async_head_up(self) -> Dict[str, Any]:
-        """Move head elevation up (Command 110)."""
-        return await self.async_send_command(CMD_HEAD_UP, request_status=False)
+    async def _async_send_pulse(
+        self,
+        command: int,
+        pulses: int = 3,
+        delay: float = 0.15,
+    ) -> None:
+        """Send an actuator command multiple times in rapid succession.
 
-    async def async_head_down(self) -> Dict[str, Any]:
-        """Move head elevation down (Command 107)."""
-        return await self.async_send_command(CMD_HEAD_DOWN, request_status=False)
+        Physical actuators on the smart base occasionally ignore a single
+        command burst. Pulsing the command a few times with a short delay
+        between each burst ensures the motor registers the request reliably.
+        """
+        for i in range(pulses):
+            await self.async_send_command(command, request_status=False)
+            if i < pulses - 1:
+                await asyncio.sleep(delay)
 
-    async def async_foot_up(self) -> Dict[str, Any]:
-        """Move foot elevation up (Command 108)."""
-        return await self.async_send_command(CMD_FOOT_UP, request_status=False)
+    async def async_head_up(self) -> None:
+        """Move head elevation up (Command 110) — pulsed for reliability."""
+        await self._async_send_pulse(CMD_HEAD_UP)
 
-    async def async_foot_down(self) -> Dict[str, Any]:
-        """Move foot elevation down (Command 113)."""
-        return await self.async_send_command(CMD_FOOT_DOWN, request_status=False)
+    async def async_head_down(self) -> None:
+        """Move head elevation down (Command 107) — pulsed for reliability."""
+        await self._async_send_pulse(CMD_HEAD_DOWN)
+
+    async def async_foot_up(self) -> None:
+        """Move foot elevation up (Command 108) — pulsed for reliability."""
+        await self._async_send_pulse(CMD_FOOT_UP)
+
+    async def async_foot_down(self) -> None:
+        """Move foot elevation down (Command 113) — pulsed for reliability."""
+        await self._async_send_pulse(CMD_FOOT_DOWN)
 
     async def async_preset_flat(self) -> Dict[str, Any]:
         """Move base to flat preset (Command 2)."""
