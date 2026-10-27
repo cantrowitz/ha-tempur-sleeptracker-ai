@@ -47,6 +47,14 @@ WIND_DOWN_MODES = {
     32: "Prepare for Sleep",
 }
 
+# Actuator timing
+# The Sleeptracker base uses a press-and-hold protocol: send the movement command
+# to start the motor, then send the opposing command to stop it.  These constants
+# control how long the motor runs for simple open/close button presses and the
+# estimated pulse rate used to derive a hold duration for set_cover_position.
+ACTUATOR_NUDGE_SECS: float = 1.5        # seconds to hold for a plain open/close press
+ACTUATOR_PULSES_PER_SEC: float = 200.0  # estimated motor speed (pulses/sec); tune if needed
+
 # Configuration Keys
 CONF_DEVICE_ID = "device_id"
 CONF_PROCESSOR_SERIAL = "processor_serial"

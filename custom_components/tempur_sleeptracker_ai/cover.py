@@ -11,6 +11,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
+    ACTUATOR_NUDGE_SECS,
+    ACTUATOR_PULSES_PER_SEC,
     CONF_FOOT_TICKS,
     CONF_HEAD_TICKS,
     CONF_PROCESSOR_SERIAL,
@@ -23,6 +25,21 @@ _LOGGER = logging.getLogger(__name__)
 # Typical maximum elevation angles in degrees
 MAX_HEAD_DEGREES = 60.0
 MAX_FOOT_DEGREES = 45.0
+
+# Clamp hold duration so a single HA action can't run the motor indefinitely
+_MIN_HOLD_SECS = 0.2
+_MAX_HOLD_SECS = 45.0
+
+
+def _hold_duration(delta_pulses: float) -> float:
+    """Convert a pulse-count delta to a motor hold duration in seconds.
+
+    Uses the estimated ACTUATOR_PULSES_PER_SEC constant.  The result is
+    clamped to a safe range so network jitter or extreme position deltas
+    never stall HA or overdrive the motor.
+    """
+    secs = abs(delta_pulses) / ACTUATOR_PULSES_PER_SEC
+    return max(_MIN_HOLD_SECS, min(_MAX_HOLD_SECS, secs))
 
 
 async def async_setup_entry(
@@ -76,25 +93,42 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
         return self.current_cover_position == 0
 
     async def async_open_cover(self, **kwargs: Any) -> None:
-        """Raise head elevation."""
-        await self._api.async_head_up()
+        """Raise head elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        await self._api.async_head_up(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
-        """Lower head elevation."""
-        await self._api.async_head_down()
+        """Lower head elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        await self._api.async_head_down(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
-        """Set head elevation position percentage."""
+        """Move head to the requested position percentage.
+
+        Calculates how long to hold the motor based on the pulse delta between
+        current and target positions, then issues the appropriate direction command.
+        """
         target_pos = kwargs.get("position", 0)
         current = self.current_cover_position
-        if target_pos == 0:
-            await self._api.async_head_down()
-        elif target_pos > current:
-            await self._api.async_head_up()
+
+        if target_pos == current:
+            return
+
+        target_pulse = (target_pos / 100.0) * self._max_pulse
+        current_pulse = (current / 100.0) * self._max_pulse
+        delta = target_pulse - current_pulse
+        hold = _hold_duration(delta)
+
+        _LOGGER.debug(
+            "Head set_position: current=%d%% target=%d%% delta_pulses=%.0f hold=%.2fs",
+            current, target_pos, delta, hold,
+        )
+
+        if delta > 0:
+            await self._api.async_head_up(hold_secs=hold)
         else:
-            await self._api.async_head_down()
+            await self._api.async_head_down(hold_secs=hold)
+
         await self.coordinator.async_request_refresh()
 
 
@@ -133,23 +167,41 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
         return self.current_cover_position == 0
 
     async def async_open_cover(self, **kwargs: Any) -> None:
-        """Raise foot elevation."""
-        await self._api.async_foot_up()
+        """Raise foot elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        await self._api.async_foot_up(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
-        """Lower foot elevation."""
-        await self._api.async_foot_down()
+        """Lower foot elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        await self._api.async_foot_down(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
-        """Set foot elevation position percentage."""
+        """Move foot to the requested position percentage.
+
+        Calculates how long to hold the motor based on the pulse delta between
+        current and target positions, then issues the appropriate direction command.
+        """
         target_pos = kwargs.get("position", 0)
         current = self.current_cover_position
-        if target_pos == 0:
-            await self._api.async_foot_down()
-        elif target_pos > current:
-            await self._api.async_foot_up()
+
+        if target_pos == current:
+            return
+
+        target_pulse = (target_pos / 100.0) * self._max_pulse
+        current_pulse = (current / 100.0) * self._max_pulse
+        delta = target_pulse - current_pulse
+        hold = _hold_duration(delta)
+
+        _LOGGER.debug(
+            "Foot set_position: current=%d%% target=%d%% delta_pulses=%.0f hold=%.2fs",
+            current, target_pos, delta, hold,
+        )
+
+        if delta > 0:
+            await self._api.async_foot_up(hold_secs=hold)
         else:
-            await self._api.async_foot_down()
+            await self._api.async_foot_down(hold_secs=hold)
+
         await self.coordinator.async_request_refresh()
+

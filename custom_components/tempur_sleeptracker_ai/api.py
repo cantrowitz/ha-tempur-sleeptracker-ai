@@ -314,38 +314,38 @@ class TempurPedicApiClient:
         """Toggle underbed / safety light (Command 230)."""
         return await self.async_send_command(CMD_TOGGLE_LIGHT, request_status=False)
 
-    async def _async_send_pulse(
+    async def _async_actuate(
         self,
-        command: int,
-        pulses: int = 3,
-        delay: float = 0.15,
+        start_cmd: int,
+        stop_cmd: int,
+        hold_secs: float,
     ) -> None:
-        """Send an actuator command multiple times in rapid succession.
+        """Drive an actuator motor using the press-and-hold protocol.
 
-        Physical actuators on the smart base occasionally ignore a single
-        command burst. Pulsing the command a few times with a short delay
-        between each burst ensures the motor registers the request reliably.
+        The Sleeptracker base mirrors how the official app handles physical
+        button presses: sending ``start_cmd`` starts the motor, and sending
+        the opposing ``stop_cmd`` stops it.  The motor runs for ``hold_secs``
+        between the two calls.
         """
-        for i in range(pulses):
-            await self.async_send_command(command, request_status=False)
-            if i < pulses - 1:
-                await asyncio.sleep(delay)
+        await self.async_send_command(start_cmd, request_status=False)
+        await asyncio.sleep(hold_secs)
+        await self.async_send_command(stop_cmd, request_status=False)
 
-    async def async_head_up(self) -> None:
-        """Move head elevation up (Command 110) — pulsed for reliability."""
-        await self._async_send_pulse(CMD_HEAD_UP)
+    async def async_head_up(self, hold_secs: float = 1.5) -> None:
+        """Move head elevation up, then stop after hold_secs."""
+        await self._async_actuate(CMD_HEAD_UP, CMD_HEAD_DOWN, hold_secs)
 
-    async def async_head_down(self) -> None:
-        """Move head elevation down (Command 107) — pulsed for reliability."""
-        await self._async_send_pulse(CMD_HEAD_DOWN)
+    async def async_head_down(self, hold_secs: float = 1.5) -> None:
+        """Move head elevation down, then stop after hold_secs."""
+        await self._async_actuate(CMD_HEAD_DOWN, CMD_HEAD_UP, hold_secs)
 
-    async def async_foot_up(self) -> None:
-        """Move foot elevation up (Command 108) — pulsed for reliability."""
-        await self._async_send_pulse(CMD_FOOT_UP)
+    async def async_foot_up(self, hold_secs: float = 1.5) -> None:
+        """Move foot elevation up, then stop after hold_secs."""
+        await self._async_actuate(CMD_FOOT_UP, CMD_FOOT_DOWN, hold_secs)
 
-    async def async_foot_down(self) -> None:
-        """Move foot elevation down (Command 113) — pulsed for reliability."""
-        await self._async_send_pulse(CMD_FOOT_DOWN)
+    async def async_foot_down(self, hold_secs: float = 1.5) -> None:
+        """Move foot elevation down, then stop after hold_secs."""
+        await self._async_actuate(CMD_FOOT_DOWN, CMD_FOOT_UP, hold_secs)
 
     async def async_preset_flat(self) -> Dict[str, Any]:
         """Move base to flat preset (Command 2)."""
