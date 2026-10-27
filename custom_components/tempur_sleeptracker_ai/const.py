@@ -5,7 +5,7 @@ DOMAIN = "tempur_sleeptracker_ai"
 MANUFACTURER = "Tempur-Pedic"
 
 PLATFORMS: list[Platform] = [
-    Platform.COVER,
+    Platform.NUMBER,
     Platform.LIGHT,
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
