@@ -175,3 +175,30 @@ def test_platform_modules_import():
     import tempur_sleeptracker_ai.const  # noqa: F401
     import tempur_sleeptracker_ai.cover  # noqa: F401
     import tempur_sleeptracker_ai.entity  # noqa: F401
+
+
+def test_no_duplicate_class_definitions():
+    """No top-level class may be defined twice in an integration module.
+
+    button.py once defined FlatPreset / ZeroG / StopWindDown /
+    RefreshStatus twice; the second definition silently shadowed the
+    first, so edits to the first copy would have done nothing at
+    runtime. Runtime imports cannot see this — parse the source AST.
+    Removed 2026-10-27; guard against it returning in any module.
+    """
+    import ast
+    from collections import Counter
+    from pathlib import Path
+
+    # Locate the package from this test file's location: the stub package
+    # module used in these tests has no __file__ of its own.
+    pkg_dir = (
+        Path(__file__).resolve().parents[1]
+        / "custom_components"
+        / "tempur_sleeptracker_ai"
+    )
+    for path in sorted(pkg_dir.glob("*.py")):
+        tree = ast.parse(path.read_text())
+        names = [n.name for n in tree.body if isinstance(n, ast.ClassDef)]
+        dupes = [name for name, count in Counter(names).items() if count > 1]
+        assert not dupes, f"{path.name} defines classes more than once: {dupes}"
