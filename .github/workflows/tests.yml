@@ -1,0 +1,21 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: pip install pytest
+      # The suite stubs Home Assistant (see tests/conftest.py), so no HA
+      # install is needed: it tests the integration's own logic — command
+      # sequences, constants, cover math — in a few seconds.
+      - name: Run tests
+        run: python -m pytest -q

@@ -67,6 +67,7 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
         CoverEntityFeature.SET_POSITION
         | CoverEntityFeature.OPEN
         | CoverEntityFeature.CLOSE
+        | CoverEntityFeature.STOP
     )
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -93,13 +94,18 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
         return False
 
     async def async_open_cover(self, **kwargs: Any) -> None:
-        """Raise head elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        """Raise head elevation by one nudge (110, stop 107)."""
         await self._api.async_head_up(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
-        """Lower head elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        """Lower head elevation by one nudge (111, stop 107)."""
         await self._api.async_head_down(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self.coordinator.async_request_refresh()
+
+    async def async_stop_cover(self, **kwargs: Any) -> None:
+        """Stop head movement immediately (107 — the dedicated stop, not 'down')."""
+        await self._api.async_head_stop()
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
@@ -115,7 +121,9 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
             return
 
         target_pulse = (target_pos / 100.0) * self._max_pulse
-        current_pulse = (current / 100.0) * self._max_pulse
+        # Use the raw pulse count, not a round-trip through the rounded
+        # percentage — the old code lost up to ~1% of full travel of delta.
+        current_pulse = float((self.coordinator.data or {}).get("head_pulse", 0))
         delta = target_pulse - current_pulse
         hold = _hold_duration(delta)
 
@@ -141,6 +149,7 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
         CoverEntityFeature.SET_POSITION
         | CoverEntityFeature.OPEN
         | CoverEntityFeature.CLOSE
+        | CoverEntityFeature.STOP
     )
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -167,13 +176,18 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
         return False
 
     async def async_open_cover(self, **kwargs: Any) -> None:
-        """Raise foot elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        """Raise foot elevation by one nudge (112, stop 108)."""
         await self._api.async_foot_up(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
-        """Lower foot elevation by one nudge (press-and-hold for ACTUATOR_NUDGE_SECS)."""
+        """Lower foot elevation by one nudge (113, stop 108)."""
         await self._api.async_foot_down(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self.coordinator.async_request_refresh()
+
+    async def async_stop_cover(self, **kwargs: Any) -> None:
+        """Stop foot movement immediately (108 — the dedicated stop, not 'down')."""
+        await self._api.async_foot_stop()
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
@@ -189,7 +203,8 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
             return
 
         target_pulse = (target_pos / 100.0) * self._max_pulse
-        current_pulse = (current / 100.0) * self._max_pulse
+        # Raw pulse count, as in the head cover — see note there.
+        current_pulse = float((self.coordinator.data or {}).get("foot_pulse", 0))
         delta = target_pulse - current_pulse
         hold = _hold_duration(delta)
 

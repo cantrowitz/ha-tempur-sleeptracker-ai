@@ -11,9 +11,14 @@ from .const import (
     CLIENT_ID,
     CLIENT_VERSION,
     CMD_FOOT_DOWN,
+    CMD_FOOT_STOP,
     CMD_FOOT_UP,
     CMD_HEAD_DOWN,
+    CMD_HEAD_STOP,
     CMD_HEAD_UP,
+    CMD_LUMBAR_DOWN,
+    CMD_LUMBAR_STOP,
+    CMD_LUMBAR_UP,
     CMD_POLL_STATUS,
     CMD_PRESET_FLAT,
     CMD_PRESET_ZERO_G,
@@ -322,30 +327,60 @@ class TempurPedicApiClient:
     ) -> None:
         """Drive an actuator motor using the press-and-hold protocol.
 
-        The Sleeptracker base mirrors how the official app handles physical
-        button presses: sending ``start_cmd`` starts the motor, and sending
-        the opposing ``stop_cmd`` stops it.  The motor runs for ``hold_secs``
-        between the two calls.
+        Sending ``start_cmd`` starts the motor, and sending that
+        actuator's dedicated ``stop_cmd`` halts it — the stop command is
+        NOT the opposite direction's start command:
+
+            Head:   up 110 -> stop 107 | down 111 -> stop 107
+            Foot:   up 112 -> stop 108 | down 113 -> stop 108
+            Lumbar: up 114 -> stop 106 | down 115 -> stop 106
+
+        The motor runs for ``hold_secs`` between the two calls. The stop
+        is sent from a finally block so the motor is halted even if the
+        hold is cancelled (e.g. HA shutting down or the caller being
+        cancelled) or the sleep raises.
         """
         await self.async_send_command(start_cmd, request_status=False)
-        await asyncio.sleep(hold_secs)
-        await self.async_send_command(stop_cmd, request_status=False)
+        try:
+            await asyncio.sleep(hold_secs)
+        finally:
+            await self.async_send_command(stop_cmd, request_status=False)
 
     async def async_head_up(self, hold_secs: float = 1.5) -> None:
-        """Move head elevation up, then stop after hold_secs."""
-        await self._async_actuate(CMD_HEAD_UP, CMD_HEAD_DOWN, hold_secs)
+        """Move head elevation up (110), then stop (107) after hold_secs."""
+        await self._async_actuate(CMD_HEAD_UP, CMD_HEAD_STOP, hold_secs)
 
     async def async_head_down(self, hold_secs: float = 1.5) -> None:
-        """Move head elevation down, then stop after hold_secs."""
-        await self._async_actuate(CMD_HEAD_DOWN, CMD_HEAD_UP, hold_secs)
+        """Move head elevation down (111), then stop (107) after hold_secs."""
+        await self._async_actuate(CMD_HEAD_DOWN, CMD_HEAD_STOP, hold_secs)
+
+    async def async_head_stop(self) -> None:
+        """Stop head movement immediately (107), whichever way it's moving."""
+        await self.async_send_command(CMD_HEAD_STOP, request_status=False)
 
     async def async_foot_up(self, hold_secs: float = 1.5) -> None:
-        """Move foot elevation up, then stop after hold_secs."""
-        await self._async_actuate(CMD_FOOT_UP, CMD_FOOT_DOWN, hold_secs)
+        """Move foot elevation up (112), then stop (108) after hold_secs."""
+        await self._async_actuate(CMD_FOOT_UP, CMD_FOOT_STOP, hold_secs)
 
     async def async_foot_down(self, hold_secs: float = 1.5) -> None:
-        """Move foot elevation down, then stop after hold_secs."""
-        await self._async_actuate(CMD_FOOT_DOWN, CMD_FOOT_UP, hold_secs)
+        """Move foot elevation down (113), then stop (108) after hold_secs."""
+        await self._async_actuate(CMD_FOOT_DOWN, CMD_FOOT_STOP, hold_secs)
+
+    async def async_foot_stop(self) -> None:
+        """Stop foot movement immediately (108), whichever way it's moving."""
+        await self.async_send_command(CMD_FOOT_STOP, request_status=False)
+
+    async def async_lumbar_up(self, hold_secs: float = 1.5) -> None:
+        """Move lumbar up (114), then stop (106) after hold_secs."""
+        await self._async_actuate(CMD_LUMBAR_UP, CMD_LUMBAR_STOP, hold_secs)
+
+    async def async_lumbar_down(self, hold_secs: float = 1.5) -> None:
+        """Move lumbar down (115), then stop (106) after hold_secs."""
+        await self._async_actuate(CMD_LUMBAR_DOWN, CMD_LUMBAR_STOP, hold_secs)
+
+    async def async_lumbar_stop(self) -> None:
+        """Stop lumbar movement immediately (106), whichever way it's moving."""
+        await self.async_send_command(CMD_LUMBAR_STOP, request_status=False)
 
     async def async_preset_flat(self) -> Dict[str, Any]:
         """Move base to flat preset (Command 2)."""

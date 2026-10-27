@@ -20,11 +20,11 @@ async def async_setup_entry(
     coordinator = data.coordinator if hasattr(data, "coordinator") else data["coordinator"]
 
     async_add_entities([
-        # Elevation nudge buttons
-        TempurPedicHeadUpButton(coordinator, api, entry),
-        TempurPedicHeadDownButton(coordinator, api, entry),
-        TempurPedicFootUpButton(coordinator, api, entry),
-        TempurPedicFootDownButton(coordinator, api, entry),
+        # Elevation nudge buttons — lumbar only. Head/foot are controlled
+        # from their cover entities (up / stop / down); separate nudge
+        # buttons for them were removed 2026-10-26 as duplicates.
+        TempurPedicLumbarUpButton(coordinator, api, entry),
+        TempurPedicLumbarDownButton(coordinator, api, entry),
         # Presets
         TempurPedicFlatPresetButton(coordinator, api, entry),
         TempurPedicZeroGPresetButton(coordinator, api, entry),
@@ -39,71 +39,37 @@ async def async_setup_entry(
 # Elevation nudge buttons
 # ---------------------------------------------------------------------------
 
-class TempurPedicHeadUpButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge head elevation up by one press-and-hold interval."""
+class TempurPedicLumbarUpButton(TempurPedicBaseEntity, ButtonEntity):
+    """Nudge lumbar up by one press-and-hold interval (114, stop 106)."""
 
-    _attr_name = "Head up"
+    _attr_name = "Lumbar up"
     _attr_icon = "mdi:arrow-up-bold"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry)
         self._api = api_client
         serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_head_up"
+        self._attr_unique_id = f"{serial}_lumbar_up"
 
     async def async_press(self) -> None:
-        await self._api.async_head_up(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self._api.async_lumbar_up(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
 
-class TempurPedicHeadDownButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge head elevation down by one press-and-hold interval."""
+class TempurPedicLumbarDownButton(TempurPedicBaseEntity, ButtonEntity):
+    """Nudge lumbar down by one press-and-hold interval (115, stop 106)."""
 
-    _attr_name = "Head down"
+    _attr_name = "Lumbar down"
     _attr_icon = "mdi:arrow-down-bold"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry)
         self._api = api_client
         serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_head_down"
+        self._attr_unique_id = f"{serial}_lumbar_down"
 
     async def async_press(self) -> None:
-        await self._api.async_head_down(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-
-class TempurPedicFootUpButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge foot elevation up by one press-and-hold interval."""
-
-    _attr_name = "Foot up"
-    _attr_icon = "mdi:arrow-up-bold"
-
-    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._api = api_client
-        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_foot_up"
-
-    async def async_press(self) -> None:
-        await self._api.async_foot_up(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-
-class TempurPedicFootDownButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge foot elevation down by one press-and-hold interval."""
-
-    _attr_name = "Foot down"
-    _attr_icon = "mdi:arrow-down-bold"
-
-    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._api = api_client
-        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_foot_down"
-
-    async def async_press(self) -> None:
-        await self._api.async_foot_down(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self._api.async_lumbar_down(hold_secs=ACTUATOR_NUDGE_SECS)
         await self.coordinator.async_request_refresh()
 
 
