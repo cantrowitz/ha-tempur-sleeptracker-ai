@@ -18,7 +18,7 @@ Connects directly to the Sleeptracker cloud using your standard app credentials 
   - **Head Elevation** (`cover.<bed_name>_head_elevation`): Position control, scaled via calibrated ticks per degree (`234.0 ticks/deg`). Open / close / stop.
   - **Foot Elevation** (`cover.<bed_name>_foot_elevation`): Position control, scaled via calibrated ticks per degree (`306.0 ticks/deg`). Open / close / stop.
   - **Lumbar Support** (`cover.<bed_name>_lumbar_support`): Open / close / stop (position reporting is not available for lumbar).
-- **Position Presets (Buttons)**: Flat, Zero-G, TV in Bed, Quiet Mode (anti-snore), Favourite 1, Favourite 2.
+- **Position Presets (Buttons)**: Flat, Zero-G, TV in Bed, Quiet Mode (anti-snore), Favorite 1, Favorite 2.
 - **Wave Form Massage (Buttons & Sensors)**:
   - Head and foot zone strength step buttons (cycle: off → 4 → 6 → 8 → off).
   - Wave Form frequency buttons: 28 Hz (low) and 40 Hz (high), plus a pattern-cycle button (patterns 1–3).

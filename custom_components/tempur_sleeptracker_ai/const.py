@@ -54,14 +54,16 @@ CMD_LUMBAR_STOP = 106
 # Other commands
 #
 # Preset commands (verified from app captures, Adam, 2026-10-27):
-#   0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode | 6 Favourite 1 | 9 Favourite 2
+#   0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode | 6 Favorite 1 | 9 Favorite 2
+# (The Sleeptracker app itself labels the two saved slots "Favourite 1/2";
+#  this integration uses the US spelling.)
 # Codes 1, 5, 7 and 8 are unassigned as far as we know — do not guess them.
 CMD_PRESET_ZERO_G     = 0
 CMD_PRESET_FLAT       = 2
 CMD_PRESET_TV         = 3
 CMD_PRESET_QUIET_MODE = 4
-CMD_PRESET_FAVOURITE_1 = 6
-CMD_PRESET_FAVOURITE_2 = 9
+CMD_PRESET_FAVORITE_1 = 6
+CMD_PRESET_FAVORITE_2 = 9
 CMD_TOGGLE_LIGHT   = 230
 CMD_POLL_STATUS    = 500
 

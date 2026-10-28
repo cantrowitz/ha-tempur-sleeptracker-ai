@@ -242,11 +242,11 @@ class FakeApi:
     async def async_preset_quiet_mode(self):
         self.calls.append(("preset_quiet_mode", None))
 
-    async def async_preset_favourite_1(self):
-        self.calls.append(("preset_favourite_1", None))
+    async def async_preset_favorite_1(self):
+        self.calls.append(("preset_favorite_1", None))
 
-    async def async_preset_favourite_2(self):
-        self.calls.append(("preset_favourite_2", None))
+    async def async_preset_favorite_2(self):
+        self.calls.append(("preset_favorite_2", None))
 
     async def async_massage_head_strength_step(self):
         self.calls.append(("massage_head_strength", None))

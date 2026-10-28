@@ -25,8 +25,8 @@ from .const import (
     CMD_MASSAGE_FREQ_40HZ,
     CMD_MASSAGE_HEAD_STRENGTH,
     CMD_POLL_STATUS,
-    CMD_PRESET_FAVOURITE_1,
-    CMD_PRESET_FAVOURITE_2,
+    CMD_PRESET_FAVORITE_1,
+    CMD_PRESET_FAVORITE_2,
     CMD_PRESET_FLAT,
     CMD_PRESET_QUIET_MODE,
     CMD_PRESET_TV,
@@ -434,13 +434,13 @@ class TempurPedicApiClient:
         """Move base to QuietMode (anti-snore) preset (Command 4)."""
         return await self.async_send_command(CMD_PRESET_QUIET_MODE, request_status=False)
 
-    async def async_preset_favourite_1(self) -> Dict[str, Any]:
-        """Move base to Favourite 1 (user-saved) preset (Command 6)."""
-        return await self.async_send_command(CMD_PRESET_FAVOURITE_1, request_status=False)
+    async def async_preset_favorite_1(self) -> Dict[str, Any]:
+        """Move base to Favorite 1 (user-saved) preset (Command 6)."""
+        return await self.async_send_command(CMD_PRESET_FAVORITE_1, request_status=False)
 
-    async def async_preset_favourite_2(self) -> Dict[str, Any]:
-        """Move base to Favourite 2 (user-saved) preset (Command 9)."""
-        return await self.async_send_command(CMD_PRESET_FAVOURITE_2, request_status=False)
+    async def async_preset_favorite_2(self) -> Dict[str, Any]:
+        """Move base to Favorite 2 (user-saved) preset (Command 9)."""
+        return await self.async_send_command(CMD_PRESET_FAVORITE_2, request_status=False)
 
     # ------------------------------------------------------------------
     # Massage (Wave Form). All captured massage commands carried

@@ -4,7 +4,7 @@ Command table verified from Sleeptracker app captures (Adam, 2026-10-27):
 
     Presets (massageAdjustment 0, requestStatus false):
         0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode
-        6 Favourite 1 | 9 Favourite 2
+        6 Favorite 1 | 9 Favorite 2
     Massage (massageAdjustment 1, requestStatus true):
         210 head strength step | 211 foot strength step
         212 Wave Form 28 Hz    | 213 Wave Form 40 Hz
@@ -37,8 +37,8 @@ def test_preset_command_table():
     assert const.CMD_PRESET_FLAT == 2
     assert const.CMD_PRESET_TV == 3
     assert const.CMD_PRESET_QUIET_MODE == 4
-    assert const.CMD_PRESET_FAVOURITE_1 == 6
-    assert const.CMD_PRESET_FAVOURITE_2 == 9
+    assert const.CMD_PRESET_FAVORITE_1 == 6
+    assert const.CMD_PRESET_FAVORITE_2 == 9
 
 
 def test_massage_command_table():
@@ -54,8 +54,8 @@ def test_new_commands_do_not_collide_with_existing():
     new = {
         const.CMD_PRESET_TV,
         const.CMD_PRESET_QUIET_MODE,
-        const.CMD_PRESET_FAVOURITE_1,
-        const.CMD_PRESET_FAVOURITE_2,
+        const.CMD_PRESET_FAVORITE_1,
+        const.CMD_PRESET_FAVORITE_2,
         const.CMD_MASSAGE_HEAD_STRENGTH,
         const.CMD_MASSAGE_FOOT_STRENGTH,
         const.CMD_MASSAGE_FREQ_28HZ,
@@ -104,8 +104,8 @@ def api():
     [
         ("async_preset_tv", (3, 0, False)),
         ("async_preset_quiet_mode", (4, 0, False)),
-        ("async_preset_favourite_1", (6, 0, False)),
-        ("async_preset_favourite_2", (9, 0, False)),
+        ("async_preset_favorite_1", (6, 0, False)),
+        ("async_preset_favorite_2", (9, 0, False)),
         ("async_massage_head_strength_step", (210, 1, True)),
         ("async_massage_foot_strength_step", (211, 1, True)),
         ("async_massage_freq_28hz", (212, 1, True)),
@@ -126,8 +126,8 @@ def test_api_dispatch(api, method, expected):
     [
         ("TempurPedicTVPresetButton", ("preset_tv", None)),
         ("TempurPedicQuietModePresetButton", ("preset_quiet_mode", None)),
-        ("TempurPedicFavourite1PresetButton", ("preset_favourite_1", None)),
-        ("TempurPedicFavourite2PresetButton", ("preset_favourite_2", None)),
+        ("TempurPedicFavorite1PresetButton", ("preset_favorite_1", None)),
+        ("TempurPedicFavorite2PresetButton", ("preset_favorite_2", None)),
         ("TempurPedicMassageHeadStrengthButton", ("massage_head_strength", None)),
         ("TempurPedicMassageFootStrengthButton", ("massage_foot_strength", None)),
         ("TempurPedicMassageFreq28Button", ("massage_freq_28hz", None)),
@@ -146,8 +146,8 @@ def test_new_button_unique_ids_are_distinct():
     classes = [
         "TempurPedicTVPresetButton",
         "TempurPedicQuietModePresetButton",
-        "TempurPedicFavourite1PresetButton",
-        "TempurPedicFavourite2PresetButton",
+        "TempurPedicFavorite1PresetButton",
+        "TempurPedicFavorite2PresetButton",
         "TempurPedicMassageHeadStrengthButton",
         "TempurPedicMassageFootStrengthButton",
         "TempurPedicMassageFreq28Button",

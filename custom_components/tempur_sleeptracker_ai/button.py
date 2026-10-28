@@ -29,8 +29,8 @@ async def async_setup_entry(
         TempurPedicZeroGPresetButton(coordinator, api, entry),
         TempurPedicTVPresetButton(coordinator, api, entry),
         TempurPedicQuietModePresetButton(coordinator, api, entry),
-        TempurPedicFavourite1PresetButton(coordinator, api, entry),
-        TempurPedicFavourite2PresetButton(coordinator, api, entry),
+        TempurPedicFavorite1PresetButton(coordinator, api, entry),
+        TempurPedicFavorite2PresetButton(coordinator, api, entry),
         # Massage (Wave Form)
         TempurPedicMassageHeadStrengthButton(coordinator, api, entry),
         TempurPedicMassageFootStrengthButton(coordinator, api, entry),
@@ -116,37 +116,37 @@ class TempurPedicQuietModePresetButton(TempurPedicBaseEntity, ButtonEntity):
         await self.coordinator.async_request_refresh()
 
 
-class TempurPedicFavourite1PresetButton(TempurPedicBaseEntity, ButtonEntity):
-    """Button to recall Favourite 1 (user-saved) preset (command 6)."""
+class TempurPedicFavorite1PresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to recall Favorite 1 (user-saved) preset (command 6)."""
 
-    _attr_name = "Favourite 1 preset"
+    _attr_name = "Favorite 1 preset"
     _attr_icon = "mdi:star"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry)
         self._api = api_client
         serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_preset_favourite_1"
+        self._attr_unique_id = f"{serial}_preset_favorite_1"
 
     async def async_press(self) -> None:
-        await self._api.async_preset_favourite_1()
+        await self._api.async_preset_favorite_1()
         await self.coordinator.async_request_refresh()
 
 
-class TempurPedicFavourite2PresetButton(TempurPedicBaseEntity, ButtonEntity):
-    """Button to recall Favourite 2 (user-saved) preset (command 9)."""
+class TempurPedicFavorite2PresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to recall Favorite 2 (user-saved) preset (command 9)."""
 
-    _attr_name = "Favourite 2 preset"
+    _attr_name = "Favorite 2 preset"
     _attr_icon = "mdi:star-outline"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
         super().__init__(coordinator, entry)
         self._api = api_client
         serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_preset_favourite_2"
+        self._attr_unique_id = f"{serial}_preset_favorite_2"
 
     async def async_press(self) -> None:
-        await self._api.async_preset_favourite_2()
+        await self._api.async_preset_favorite_2()
         await self.coordinator.async_request_refresh()
 
 
