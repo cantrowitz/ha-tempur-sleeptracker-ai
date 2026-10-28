@@ -170,3 +170,44 @@ def test_massage_strength_sensors():
     foot = sensor.TempurPedicFootMassageStrengthSensor(FakeCoordinator(data), make_entry())
     assert head.native_value == 6
     assert foot.native_value == 4
+
+
+# ---------------------------------------------------------------------------
+# Massage status sensors: pattern and frequency as readable states
+# (snapshot semantics from Adam's captures, 2026-10-27: pattern 0 =
+# steady, 1-3 = Wave Form pattern, 4 = off; frequency 0 = off)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    "raw,expected",
+    [(0, "Steady"), (1, "1"), (2, "2"), (3, "3"), (4, "Off"), (7, "7")],
+)
+def test_massage_pattern_sensor_states(raw, expected):
+    entity = sensor.TempurPedicMassagePatternSensor(
+        FakeCoordinator({"massage_pattern": raw}), make_entry()
+    )
+    assert entity.native_value == expected
+
+
+def test_massage_pattern_sensor_defaults_to_off_without_data():
+    entity = sensor.TempurPedicMassagePatternSensor(FakeCoordinator({}), make_entry())
+    assert entity.native_value == "Off"
+
+
+@pytest.mark.parametrize(
+    "hz,expected", [(0, "Off"), (28, "28 Hz"), (40, "40 Hz"), (33, "33 Hz")]
+)
+def test_massage_frequency_setting_sensor_states(hz, expected):
+    entity = sensor.TempurPedicMassageFrequencySettingSensor(
+        FakeCoordinator({"massage_frequency_hz": hz}), make_entry()
+    )
+    assert entity.native_value == expected
+
+
+def test_massage_status_sensor_unique_ids_are_distinct():
+    pattern = sensor.TempurPedicMassagePatternSensor(FakeCoordinator(), make_entry())
+    setting = sensor.TempurPedicMassageFrequencySettingSensor(
+        FakeCoordinator(), make_entry()
+    )
+    assert pattern._attr_unique_id.endswith("_massage_pattern")
+    assert setting._attr_unique_id.endswith("_massage_frequency_setting")
+    assert pattern._attr_unique_id != setting._attr_unique_id

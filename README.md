@@ -22,7 +22,7 @@ Connects directly to the Sleeptracker cloud using your standard app credentials 
 - **Wave Form Massage (Buttons & Sensors)**:
   - Head and foot zone strength step buttons (cycle: off → 4 → 6 → 8 → off).
   - Wave Form frequency buttons: 28 Hz (low) and 40 Hz (high), plus a pattern-cycle button (patterns 1–3).
-  - Per-zone massage strength sensors, massage frequency and remaining-time sensors, per-zone massage on/off binary sensors.
+  - Per-zone massage strength sensors, frequency (Hz) and frequency-setting (Off / 28 Hz / 40 Hz) sensors, a pattern sensor (Off / Steady / 1 / 2 / 3), remaining-time sensor, per-zone massage on/off binary sensors.
 - **Underbed Lighting (Light)**:
   - **Underbed Light** (`light.<bed_name>_underbed_light`): Toggle underbed panel and safety lighting on/off.
 - **Wind Down Programs (Select & Button)**:

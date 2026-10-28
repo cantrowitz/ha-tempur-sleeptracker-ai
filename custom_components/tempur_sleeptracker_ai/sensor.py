@@ -43,6 +43,8 @@ async def async_setup_entry(
         TempurPedicFootAngleSensor(coordinator, entry),
         TempurPedicWindDownStatusSensor(coordinator, entry),
         TempurPedicMassageFrequencySensor(coordinator, entry),
+        TempurPedicMassageFrequencySettingSensor(coordinator, entry),
+        TempurPedicMassagePatternSensor(coordinator, entry),
         TempurPedicMassageTimerSensor(coordinator, entry),
         TempurPedicHeadMassageStrengthSensor(coordinator, entry),
         TempurPedicFootMassageStrengthSensor(coordinator, entry),
@@ -160,6 +162,76 @@ class TempurPedicMassageFrequencySensor(TempurPedicBaseEntity, SensorEntity):
         """Return vibration frequency in Hz."""
         data = self.coordinator.data or {}
         return data.get("massage_frequency_hz", 0)
+
+
+class TempurPedicMassageFrequencySettingSensor(TempurPedicBaseEntity, SensorEntity):
+    """Sensor reporting the massage frequency setting as a readable state.
+
+    Companion to the numeric Massage frequency sensor: 0 Hz (massage
+    off) reads as "Off"; anything else reads as e.g. "28 Hz" / "40 Hz".
+    """
+
+    _attr_name = "Massage frequency setting"
+    _attr_icon = "mdi:vibrate"
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_frequency_setting"
+
+    @property
+    def native_value(self) -> str:
+        """Return "Off", or the running frequency like "28 Hz"."""
+        data = self.coordinator.data or {}
+        hz = data.get("massage_frequency_hz", 0)
+        if not hz:
+            return "Off"
+        return f"{hz} Hz"
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        """Expose the raw snapshot frequency for diagnostics."""
+        data = self.coordinator.data or {}
+        return {"raw_hz": data.get("massage_frequency_hz")}
+
+
+# Snapshot massagePattern semantics (Adam's app captures, 2026-10-27):
+#   0 = massage running steady, no wave pattern (the state the 28/40 Hz
+#       frequency commands leave behind)
+#   1-3 = Wave Form pattern selected by the pattern-cycle command (226)
+#   4 = massage off (the state the strength wrap-to-off leaves behind)
+MASSAGE_PATTERN_STATES = {0: "Steady", 1: "1", 2: "2", 3: "3", 4: "Off"}
+
+
+class TempurPedicMassagePatternSensor(TempurPedicBaseEntity, SensorEntity):
+    """Sensor reporting the Wave Form massage pattern as a readable state.
+
+    Reads "Off", "Steady" (massage on, no wave pattern), or the Wave
+    Form pattern number "1" / "2" / "3".
+    """
+
+    _attr_name = "Massage pattern"
+    _attr_icon = "mdi:waveform"
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_pattern"
+
+    @property
+    def native_value(self) -> str:
+        """Return the pattern state: Off / Steady / 1 / 2 / 3."""
+        data = self.coordinator.data or {}
+        raw = data.get("massage_pattern", 4)
+        return MASSAGE_PATTERN_STATES.get(raw, str(raw))
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        """Expose the raw snapshot pattern value for diagnostics."""
+        data = self.coordinator.data or {}
+        return {"raw_pattern": data.get("massage_pattern")}
 
 
 class TempurPedicMassageTimerSensor(TempurPedicBaseEntity, SensorEntity):
