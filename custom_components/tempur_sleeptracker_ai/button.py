@@ -85,7 +85,7 @@ class TempurPedicZeroGPresetButton(TempurPedicBaseEntity, ButtonEntity):
 class TempurPedicTVPresetButton(TempurPedicBaseEntity, ButtonEntity):
     """Button to position bed in TV-in-Bed preset (command 3)."""
 
-    _attr_name = "TV in bed preset"
+    _attr_name = "TV in Bed preset"
     _attr_icon = "mdi:television"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -102,7 +102,7 @@ class TempurPedicTVPresetButton(TempurPedicBaseEntity, ButtonEntity):
 class TempurPedicQuietModePresetButton(TempurPedicBaseEntity, ButtonEntity):
     """Button to position bed in QuietMode (anti-snore) preset (command 4)."""
 
-    _attr_name = "QuietMode preset"
+    _attr_name = "Quiet Mode preset"
     _attr_icon = "mdi:sleep"
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
