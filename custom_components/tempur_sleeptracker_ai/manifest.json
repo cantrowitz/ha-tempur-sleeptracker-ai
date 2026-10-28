@@ -1,6 +1,7 @@
 {
   "domain": "tempur_sleeptracker_ai",
   "name": "Tempur-Pedic Sleeptracker-AI",
+  "categories": ["health_wellbeing"],
   "codeowners": ["@cantrowitz"],
   "config_flow": true,
   "documentation": "https://github.com/cantrowitz/ha-tempur-sleeptracker-ai",

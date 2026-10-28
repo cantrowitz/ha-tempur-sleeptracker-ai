@@ -4,6 +4,8 @@
 [![GitHub Release](https://img.shields.io/github/v/release/cantrowitz/ha-tempur-sleeptracker-ai)](https://github.com/cantrowitz/ha-tempur-sleeptracker-ai/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cantrowitz&repository=ha-tempur-sleeptracker-ai&category=integration)
+
 A native Home Assistant custom component for **Tempur-Pedic Smart Bases** powered by **Sleeptracker-AI®** (Fullpower Technologies).
 
 Connects directly to the Sleeptracker cloud using your standard app credentials (email and password)—no extra hardware, MQTT broker, or Bluetooth bridges required.

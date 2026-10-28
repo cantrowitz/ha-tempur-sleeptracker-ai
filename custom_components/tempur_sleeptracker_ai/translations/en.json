@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Tempur Sleeptracker-AI",
+        "description": "Enter your Sleeptracker-AI account credentials to discover and connect your smart bed.",
+        "data": {
+          "email": "Email address",
+          "password": "Password"
+        }
+      },
+      "select_device": {
+        "title": "Select Smart Bed",
+        "description": "Multiple beds were discovered for your account. Please choose which one to configure.",
+        "data": {
+          "device": "Smart Bed"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate with Sleeptracker-AI",
+        "description": "Your Sleeptracker session has expired. Please enter your credentials to reconnect.",
+        "data": {
+          "email": "Email address",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Sleeptracker cloud servers.",
+      "invalid_auth": "Invalid email address or password.",
+      "no_devices": "No Sleeptracker smart beds were found on this account.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This smart bed is already configured.",
+      "reauth_successful": "Re-authentication was successful."
+    }
+  }
+}
