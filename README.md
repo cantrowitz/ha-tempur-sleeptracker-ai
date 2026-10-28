@@ -15,19 +15,38 @@ Connects directly to the Sleeptracker cloud using your standard app credentials 
 - **Native UI Config Flow**: Log in directly with your Sleeptracker-AI credentials from *Settings > Devices & Services*.
 - **Automatic Smart Bed Discovery**: Automatically detects your bed model (e.g., *2023 Ergo Pro Smart*, *STS60*), serial numbers, and foundation hardware. Supports multi-bed selection if multiple bases exist on your account.
 - **Elevation Articulation (Covers)**:
-  - **Head Elevation** (`cover.<bed_name>_head_elevation`): Scaled via calibrated ticks per degree (`234.0 ticks/deg`).
-  - **Foot Elevation** (`cover.<bed_name>_foot_elevation`): Scaled via calibrated ticks per degree (`306.0 ticks/deg`).
+  - **Head Elevation** (`cover.<bed_name>_head_elevation`): Position control, scaled via calibrated ticks per degree (`234.0 ticks/deg`). Open / close / stop.
+  - **Foot Elevation** (`cover.<bed_name>_foot_elevation`): Position control, scaled via calibrated ticks per degree (`306.0 ticks/deg`). Open / close / stop.
+  - **Lumbar Support** (`cover.<bed_name>_lumbar_support`): Open / close / stop (position reporting is not available for lumbar).
+- **Position Presets (Buttons)**: Flat, Zero-G, TV in Bed, Quiet Mode (anti-snore), Favourite 1, Favourite 2.
+- **Wave Form Massage (Buttons & Sensors)**:
+  - Head and foot zone strength step buttons (cycle: off → 4 → 6 → 8 → off).
+  - Wave Form frequency buttons: 28 Hz (low) and 40 Hz (high), plus a pattern-cycle button (patterns 1–3).
+  - Per-zone massage strength sensors, massage frequency and remaining-time sensors, per-zone massage on/off binary sensors.
 - **Underbed Lighting (Light)**:
   - **Underbed Light** (`light.<bed_name>_underbed_light`): Toggle underbed panel and safety lighting on/off.
 - **Wind Down Programs (Select & Button)**:
   - **Wind Down Program** (`select.<bed_name>_wind_down_program`): Switch between *Prepare for Sleep*, *Destress in Bed*, or *Off*.
   - **Stop Wind Down** (`button.<bed_name>_stop_wind_down`): Immediately stop active wind down routine.
+- **Sleep & Environment (Sensors)**:
+  - Sleep score, total / deep / REM sleep duration, sleep efficiency, snore duration.
+  - Resting and average heart rate, resting and average respiration rate.
+  - Room temperature, humidity, CO₂, VOC and air quality index (bases with environmental sensors).
 - **Telemetry & Diagnostics (Sensors)**:
   - **Wind Down Status**: Current operational mode of the base.
-  - **Massage Frequency**: Real-time vibration frequency in Hz.
-  - **Massage Timer**: Remaining minutes on massage cycle.
-  - **Head & Foot Motor Pulses**: Live diagnostic telemetry on motor encoders.
+  - **Head, Foot & Lumbar Motor Pulses**: Live diagnostic telemetry on motor encoders.
+  - Sleep recording, online and busy binary sensors.
   - **Refresh Status Button**: Force immediate telemetry refresh.
+
+---
+
+## Compatibility & Limitations
+
+- **Developed and tested with a TEMPUR-Ergo® ProSmart™ base** (Sleeptracker-AI). Other Sleeptracker-AI powered bases (Ergo Smart Base, Ergo Extend, and Sleeptracker-AI equipped models from other brands) are expected to work, but have not been tested yet — issue reports with your model and a debug log are very welcome.
+- **Cloud polling**: the integration talks to the Sleeptracker cloud (the same backend as the Sleeptracker-AI app) using your app account credentials. There is no local control; if the cloud or your internet connection is down, control is unavailable.
+- **Hardware-dependent features**: entities are provided for the features Sleeptracker-AI bases commonly expose. A base without a given motor or sensor (e.g. no lumbar motor, no massage, no environmental sensors) may show entities that never update — the status feed is parsed for your base's reported capabilities, and narrowing entity creation per model is ongoing work.
+- Position percentages for head and foot are calibrated for the tested base; other models may need different ticks-per-degree values.
+- Not all Sleeptracker app features are covered (e.g. alarm configuration and SoundScape/music mode are not currently supported).
 
 ---
 
@@ -47,14 +66,19 @@ Connects directly to the Sleeptracker cloud using your standard app credentials 
 
 ### Method 2: Manual Installation
 
-1. Download the latest release from the [Releases](https://github.com/cantrowitz/ha-tempur-sleeptracker-ai/releases) page.
-2. Copy the `custom_components/tempur_sleeptracker_ai` directory to your Home Assistant `<config_dir>/custom_components/` directory:
+1. Download the latest release from the [Releases](https://github.com/cantrowitz/ha-tempur-sleeptracker-ai/releases) page and unzip it (release zips contain the integration files at the top level).
+2. Copy the files into a `tempur_sleeptracker_ai` directory under your Home Assistant `<config_dir>/custom_components/` directory:
    ```text
    config/
    └── custom_components/
        └── tempur_sleeptracker_ai/
            ├── __init__.py
+           ├── brand/
+           │   ├── icon.png
+           │   └── icon@2x.png
            ├── api.py
+           ├── binary_sensor.py
+           ├── button.py
            ├── config_flow.py
            ├── const.py
            ├── cover.py
