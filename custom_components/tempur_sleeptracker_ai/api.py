@@ -196,6 +196,29 @@ class TempurPedicApiClient:
         snapshots = body.get("snapshots", [{}])
         snapshot = snapshots[0] if snapshots else {}
 
+        # The invariants describe what this base actually is: the controller
+        # invariant carries a capability roster (which motors and massage
+        # zones exist, whether a fan controller is fitted, how many memory
+        # slots there are). Platforms use this to only create entities for
+        # hardware the specific bed supports — a base without lumbar or
+        # without massage shouldn't grow dead entities in Home Assistant.
+        invariants = body.get("invariants", [])
+        controller = next(
+            (inv for inv in invariants if inv.get("type") == "controller"), {}
+        )
+        coprocessor = next(
+            (inv for inv in invariants if inv.get("type") == "coprocessor"), {}
+        )
+        roster = controller.get("roster", {})
+        capabilities = {
+            "motors": roster.get("motors", {}),
+            "massage": roster.get("massage", {}),
+            "fan_controller": roster.get("fanController", False),
+            "memory_slots": controller.get("memorySlots"),
+            "controller_model": controller.get("model"),
+            "coprocessor_firmware": coprocessor.get("firmwareVersionString"),
+        }
+
         _LOGGER.debug("Raw bed status snapshot: %s", snapshot)
 
         # Extract dynamic wind-down program list when the API returns it.
@@ -212,6 +235,7 @@ class TempurPedicApiClient:
 
         return {
             "online": body.get("connectionStatus") == "online",
+            "capabilities": capabilities,
             "wind_down_mode": snapshot.get("windDownMode", 0),
             "wind_down_programs": dynamic_programs,  # empty dict if API does not provide them
             "massage_frequency_hz": snapshot.get("massageFrequency", 0),
@@ -226,6 +250,8 @@ class TempurPedicApiClient:
             "lumbar_pulse": snapshot.get("lumbar", {}).get("motor", {}).get("pulseCount", 0),
             "head_massage_active": snapshot.get("head", {}).get("massage", {}).get("active", False),
             "foot_massage_active": snapshot.get("foot", {}).get("massage", {}).get("active", False),
+            "head_massage_strength": snapshot.get("head", {}).get("massage", {}).get("strength", 0),
+            "foot_massage_strength": snapshot.get("foot", {}).get("massage", {}).get("strength", 0),
             "busy_with_command": snapshot.get("busyWithCommand", False),
             "raw_snapshot": snapshot,
         }
