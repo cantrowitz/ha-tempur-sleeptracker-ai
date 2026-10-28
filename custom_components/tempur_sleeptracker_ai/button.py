@@ -5,7 +5,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ACTUATOR_NUDGE_SECS, CONF_PROCESSOR_SERIAL, DOMAIN
+from .const import CONF_PROCESSOR_SERIAL, DOMAIN
 from .entity import TempurPedicBaseEntity
 
 
@@ -20,11 +20,10 @@ async def async_setup_entry(
     coordinator = data.coordinator if hasattr(data, "coordinator") else data["coordinator"]
 
     async_add_entities([
-        # Elevation nudge buttons — lumbar only. Head/foot are controlled
-        # from their cover entities (up / stop / down); separate nudge
-        # buttons for them were removed 2026-10-26 as duplicates.
-        TempurPedicLumbarUpButton(coordinator, api, entry),
-        TempurPedicLumbarDownButton(coordinator, api, entry),
+        # No elevation buttons at all: head, foot and lumbar are all
+        # controlled from their cover entities (up / stop / down arrows).
+        # Head/foot nudge buttons were removed 2026-10-26 and the lumbar
+        # pair on 2026-10-27, both as duplicates of the covers.
         # Presets
         TempurPedicFlatPresetButton(coordinator, api, entry),
         TempurPedicZeroGPresetButton(coordinator, api, entry),
@@ -43,44 +42,6 @@ async def async_setup_entry(
         # Diagnostic
         TempurPedicRefreshStatusButton(coordinator, entry),
     ])
-
-
-# ---------------------------------------------------------------------------
-# Elevation nudge buttons
-# ---------------------------------------------------------------------------
-
-class TempurPedicLumbarUpButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge lumbar up by one press-and-hold interval (114, stop 106)."""
-
-    _attr_name = "Lumbar up"
-    _attr_icon = "mdi:arrow-up-bold"
-
-    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._api = api_client
-        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_lumbar_up"
-
-    async def async_press(self) -> None:
-        await self._api.async_lumbar_up(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-
-class TempurPedicLumbarDownButton(TempurPedicBaseEntity, ButtonEntity):
-    """Nudge lumbar down by one press-and-hold interval (115, stop 106)."""
-
-    _attr_name = "Lumbar down"
-    _attr_icon = "mdi:arrow-down-bold"
-
-    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._api = api_client
-        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
-        self._attr_unique_id = f"{serial}_lumbar_down"
-
-    async def async_press(self) -> None:
-        await self._api.async_lumbar_down(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
 
 
 # ---------------------------------------------------------------------------

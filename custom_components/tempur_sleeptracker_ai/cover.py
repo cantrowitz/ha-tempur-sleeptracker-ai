@@ -55,6 +55,7 @@ async def async_setup_entry(
     async_add_entities([
         TempurPedicHeadCover(coordinator, api, entry),
         TempurPedicFootCover(coordinator, api, entry),
+        TempurPedicLumbarCover(coordinator, api, entry),
     ])
 
 
@@ -218,5 +219,59 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
         else:
             await self._api.async_foot_down(hold_secs=hold)
 
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicLumbarCover(TempurPedicBaseEntity, CoverEntity):
+    """Lumbar support cover entity — arrows only, no position.
+
+    Unlike head/foot, lumbar has no calibration: nobody has measured its
+    full travel in pulses (head/foot convert pulses to a percentage via
+    ticks-per-degree x max degrees, and lumbar support isn't an angle).
+    Rather than invent a max-travel number — the failure mode behind the
+    2026-10-26 actuator bug — this cover advertises only OPEN / CLOSE /
+    STOP and reports no position. It gets the same up/down/stop arrow
+    controls as head/foot; SET_POSITION can be added once full-extension
+    pulses are measured (the Lumbar motor pulse sensor exists for that).
+    """
+
+    _attr_name = "Lumbar support"
+    _attr_icon = "mdi:bed"
+    _attr_supported_features = (
+        CoverEntityFeature.OPEN
+        | CoverEntityFeature.CLOSE
+        | CoverEntityFeature.STOP
+    )
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        """Initialize the lumbar support cover."""
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_lumbar_support"
+
+    @property
+    def current_cover_position(self) -> None:
+        """Position is unknown until lumbar max travel is calibrated."""
+        return None
+
+    @property
+    def is_closed(self) -> None:
+        """Unknown — follows from the unknown position."""
+        return None
+
+    async def async_open_cover(self, **kwargs: Any) -> None:
+        """Extend lumbar support by one nudge (114, stop 106)."""
+        await self._api.async_lumbar_up(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self.coordinator.async_request_refresh()
+
+    async def async_close_cover(self, **kwargs: Any) -> None:
+        """Retract lumbar support by one nudge (115, stop 106)."""
+        await self._api.async_lumbar_down(hold_secs=ACTUATOR_NUDGE_SECS)
+        await self.coordinator.async_request_refresh()
+
+    async def async_stop_cover(self, **kwargs: Any) -> None:
+        """Stop lumbar movement immediately (106 — the dedicated stop)."""
+        await self._api.async_lumbar_stop()
         await self.coordinator.async_request_refresh()
 

@@ -48,6 +48,7 @@ async def async_setup_entry(
         TempurPedicFootMassageStrengthSensor(coordinator, entry),
         TempurPedicHeadPulseSensor(coordinator, entry),
         TempurPedicFootPulseSensor(coordinator, entry),
+        TempurPedicLumbarPulseSensor(coordinator, entry),
 
         # Environmental Sensors
         TempurPedicTemperatureSensor(coordinator, entry),
@@ -262,6 +263,30 @@ class TempurPedicFootPulseSensor(TempurPedicBaseEntity, SensorEntity):
         """Return raw pulse count."""
         data = self.coordinator.data or {}
         return data.get("foot_pulse", 0)
+
+
+class TempurPedicLumbarPulseSensor(TempurPedicBaseEntity, SensorEntity):
+    """Diagnostic sensor reporting raw lumbar motor pulse count.
+
+    This is the calibration source for a future lumbar position: extend
+    the lumbar fully, read this sensor, and that count is max travel."""
+
+    _attr_name = "Lumbar motor pulse"
+    _attr_icon = "mdi:counter"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_lumbar_motor_pulse"
+
+    @property
+    def native_value(self) -> int:
+        """Return raw pulse count."""
+        data = self.coordinator.data or {}
+        return data.get("lumbar_pulse", 0)
 
 
 # -------------------------------------------------------------

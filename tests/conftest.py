@@ -227,6 +227,9 @@ class FakeApi:
     async def async_lumbar_down(self, hold_secs=None):
         self.calls.append(("lumbar_down", hold_secs))
 
+    async def async_lumbar_stop(self):
+        self.calls.append(("lumbar_stop", None))
+
     async def async_preset_flat(self):
         self.calls.append(("preset_flat", None))
 

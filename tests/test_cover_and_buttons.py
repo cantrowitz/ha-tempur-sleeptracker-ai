@@ -125,32 +125,55 @@ def test_foot_set_position_up(foot):
 
 
 # ---------------------------------------------------------------------------
-# Buttons, including the lumbar pair added with the fix
+# Lumbar cover (arrows only — no position until max travel is measured)
 # ---------------------------------------------------------------------------
-@pytest.mark.parametrize(
-    "cls_name,expected",
-    [
-        ("TempurPedicLumbarUpButton", ("lumbar_up", ACTUATOR_NUDGE_SECS)),
-        ("TempurPedicLumbarDownButton", ("lumbar_down", ACTUATOR_NUDGE_SECS)),
-    ],
-)
-def test_elevation_buttons_dispatch(cls_name, expected):
+@pytest.fixture()
+def lumbar():
     api = FakeApi()
-    entity = getattr(button, cls_name)(FakeCoordinator(), api, make_entry())
-    run(entity.async_press())
-    assert api.calls == [expected]
+    coord = FakeCoordinator({"lumbar_pulse": 0, "online": True})
+    entity = cover.TempurPedicLumbarCover(coord, api, make_entry())
+    return entity, api, coord
 
 
-def test_head_foot_nudge_buttons_removed():
-    """Head/foot are cover-only controls (up/stop/down on the cover).
-    Their separate nudge buttons were removed 2026-10-26 as duplicates —
-    if one comes back, the device page grows a third control for the
-    same motor again."""
+def test_lumbar_open_close_stop_dispatch(lumbar):
+    entity, api, _ = lumbar
+    run(entity.async_open_cover())
+    run(entity.async_close_cover())
+    run(entity.async_stop_cover())
+    assert api.calls == [
+        ("lumbar_up", ACTUATOR_NUDGE_SECS),
+        ("lumbar_down", ACTUATOR_NUDGE_SECS),
+        ("lumbar_stop", None),
+    ]
+
+
+def test_lumbar_cover_has_no_position(lumbar):
+    """No SET_POSITION and no position value: lumbar max travel in pulses
+    has never been measured, and inventing it would repeat the original
+    actuator bug in percentage form."""
+    from homeassistant.components.cover import CoverEntityFeature
+
+    entity, _, _ = lumbar
+    assert entity.current_cover_position is None
+    assert entity.is_closed is None
+    assert entity._attr_supported_features & CoverEntityFeature.OPEN
+    assert entity._attr_supported_features & CoverEntityFeature.CLOSE
+    assert entity._attr_supported_features & CoverEntityFeature.STOP
+    assert not (entity._attr_supported_features & CoverEntityFeature.SET_POSITION)
+
+
+def test_nudge_buttons_removed():
+    """All three motors are cover-only controls (up/stop/down arrows on
+    the cover). The head/foot nudge buttons were removed 2026-10-26 and
+    the lumbar pair 2026-10-27, all as duplicates — if one comes back,
+    the device page grows another control for the same motor again."""
     for cls_name in (
         "TempurPedicHeadUpButton",
         "TempurPedicHeadDownButton",
         "TempurPedicFootUpButton",
         "TempurPedicFootDownButton",
+        "TempurPedicLumbarUpButton",
+        "TempurPedicLumbarDownButton",
     ):
         assert not hasattr(button, cls_name), cls_name
 
