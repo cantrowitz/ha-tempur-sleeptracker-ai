@@ -53,15 +53,13 @@ def test_head_position_mapping(head):
     assert entity.current_cover_position == 100
 
 
-def test_head_open_close_stop_dispatch(head):
+def test_head_open_close_dispatch(head):
     entity, api, _ = head
     run(entity.async_open_cover())
     run(entity.async_close_cover())
-    run(entity.async_stop_cover())
     assert api.calls == [
         ("head_up", ACTUATOR_NUDGE_SECS),
         ("head_down", ACTUATOR_NUDGE_SECS),
-        ("head_stop", None),
     ]
 
 
@@ -88,11 +86,15 @@ def test_head_set_position_noop_when_already_there(head):
     assert api.calls == []
 
 
-def test_head_cover_advertises_stop_feature(head):
-    entity, _, _ = head
+def test_no_cover_advertises_stop_feature(head, foot, lumbar):
+    """Adam asked for the stop button gone (2026-10-27): every move is a
+    self-stopping nudge, so the button only ever appeared to do nothing.
+    The covers must not advertise STOP. (The API still sends protocol
+    stops at the end of each actuation — that's separate, and stays.)"""
     from homeassistant.components.cover import CoverEntityFeature
 
-    assert entity._attr_supported_features & CoverEntityFeature.STOP
+    for entity, _, _ in (head, foot, lumbar):
+        assert not (entity._attr_supported_features & CoverEntityFeature.STOP)
 
 
 # ---------------------------------------------------------------------------
@@ -106,15 +108,13 @@ def foot():
     return entity, api, coord
 
 
-def test_foot_open_close_stop_dispatch(foot):
+def test_foot_open_close_dispatch(foot):
     entity, api, _ = foot
     run(entity.async_open_cover())
     run(entity.async_close_cover())
-    run(entity.async_stop_cover())
     assert api.calls == [
         ("foot_up", ACTUATOR_NUDGE_SECS),
         ("foot_down", ACTUATOR_NUDGE_SECS),
-        ("foot_stop", None),
     ]
 
 
@@ -135,15 +135,13 @@ def lumbar():
     return entity, api, coord
 
 
-def test_lumbar_open_close_stop_dispatch(lumbar):
+def test_lumbar_open_close_dispatch(lumbar):
     entity, api, _ = lumbar
     run(entity.async_open_cover())
     run(entity.async_close_cover())
-    run(entity.async_stop_cover())
     assert api.calls == [
         ("lumbar_up", ACTUATOR_NUDGE_SECS),
         ("lumbar_down", ACTUATOR_NUDGE_SECS),
-        ("lumbar_stop", None),
     ]
 
 
@@ -158,12 +156,11 @@ def test_lumbar_cover_has_no_position(lumbar):
     assert entity.is_closed is None
     assert entity._attr_supported_features & CoverEntityFeature.OPEN
     assert entity._attr_supported_features & CoverEntityFeature.CLOSE
-    assert entity._attr_supported_features & CoverEntityFeature.STOP
     assert not (entity._attr_supported_features & CoverEntityFeature.SET_POSITION)
 
 
 def test_nudge_buttons_removed():
-    """All three motors are cover-only controls (up/stop/down arrows on
+    """All three motors are cover-only controls (up/down arrows on
     the cover). The head/foot nudge buttons were removed 2026-10-26 and
     the lumbar pair 2026-10-27, all as duplicates — if one comes back,
     the device page grows another control for the same motor again."""

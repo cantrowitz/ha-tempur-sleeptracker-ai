@@ -64,11 +64,14 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
 
     _attr_name = "Head elevation"
     _attr_icon = "mdi:bed"
+    # No STOP feature on any cover (removed 2026-10-27 at Adam's request):
+    # every move here is a short nudge that stops itself, so a stop button
+    # only ever appeared to do nothing. The protocol stop commands are
+    # still sent internally at the end of every actuation.
     _attr_supported_features = (
         CoverEntityFeature.SET_POSITION
         | CoverEntityFeature.OPEN
         | CoverEntityFeature.CLOSE
-        | CoverEntityFeature.STOP
     )
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -102,11 +105,6 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
     async def async_close_cover(self, **kwargs: Any) -> None:
         """Lower head elevation by one nudge (111, stop 107)."""
         await self._api.async_head_down(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-    async def async_stop_cover(self, **kwargs: Any) -> None:
-        """Stop head movement immediately (107 — the dedicated stop, not 'down')."""
-        await self._api.async_head_stop()
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
@@ -150,7 +148,6 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
         CoverEntityFeature.SET_POSITION
         | CoverEntityFeature.OPEN
         | CoverEntityFeature.CLOSE
-        | CoverEntityFeature.STOP
     )
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -184,11 +181,6 @@ class TempurPedicFootCover(TempurPedicBaseEntity, CoverEntity):
     async def async_close_cover(self, **kwargs: Any) -> None:
         """Lower foot elevation by one nudge (113, stop 108)."""
         await self._api.async_foot_down(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-    async def async_stop_cover(self, **kwargs: Any) -> None:
-        """Stop foot movement immediately (108 — the dedicated stop, not 'down')."""
-        await self._api.async_foot_stop()
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
@@ -229,10 +221,10 @@ class TempurPedicLumbarCover(TempurPedicBaseEntity, CoverEntity):
     full travel in pulses (head/foot convert pulses to a percentage via
     ticks-per-degree x max degrees, and lumbar support isn't an angle).
     Rather than invent a max-travel number — the failure mode behind the
-    2026-10-26 actuator bug — this cover advertises only OPEN / CLOSE /
-    STOP and reports no position. It gets the same up/down/stop arrow
-    controls as head/foot; SET_POSITION can be added once full-extension
-    pulses are measured (the Lumbar motor pulse sensor exists for that).
+    2026-10-26 actuator bug — this cover advertises only OPEN / CLOSE
+    and reports no position. It gets the same up/down arrow controls
+    as head/foot; SET_POSITION can be added once full-extension pulses
+    are measured (the Lumbar motor pulse sensor exists for that).
     """
 
     _attr_name = "Lumbar support"
@@ -240,7 +232,6 @@ class TempurPedicLumbarCover(TempurPedicBaseEntity, CoverEntity):
     _attr_supported_features = (
         CoverEntityFeature.OPEN
         | CoverEntityFeature.CLOSE
-        | CoverEntityFeature.STOP
     )
 
     def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
@@ -268,10 +259,5 @@ class TempurPedicLumbarCover(TempurPedicBaseEntity, CoverEntity):
     async def async_close_cover(self, **kwargs: Any) -> None:
         """Retract lumbar support by one nudge (115, stop 106)."""
         await self._api.async_lumbar_down(hold_secs=ACTUATOR_NUDGE_SECS)
-        await self.coordinator.async_request_refresh()
-
-    async def async_stop_cover(self, **kwargs: Any) -> None:
-        """Stop lumbar movement immediately (106 — the dedicated stop)."""
-        await self._api.async_lumbar_stop()
         await self.coordinator.async_request_refresh()
 
