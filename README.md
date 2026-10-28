@@ -8,6 +8,10 @@ A native Home Assistant custom component for **Tempur-Pedic Smart Bases** powere
 
 Connects directly to the Sleeptracker cloud using your standard app credentials (email and password)—no extra hardware, MQTT broker, or Bluetooth bridges required.
 
+<p align="center">
+  <img src="docs/images/device-controls.png" alt="The bed's Controls card in Home Assistant: Favorite presets, head/foot/lumbar elevation, Wave Form massage controls, underbed light and wind down programs" width="380">
+</p>
+
 ---
 
 ## Features
