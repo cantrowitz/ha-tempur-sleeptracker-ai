@@ -175,6 +175,7 @@ def test_platform_modules_import():
     import tempur_sleeptracker_ai.const  # noqa: F401
     import tempur_sleeptracker_ai.cover  # noqa: F401
     import tempur_sleeptracker_ai.entity  # noqa: F401
+    import tempur_sleeptracker_ai.sensor  # noqa: F401
 
 
 def test_no_duplicate_class_definitions():

@@ -28,6 +28,16 @@ async def async_setup_entry(
         # Presets
         TempurPedicFlatPresetButton(coordinator, api, entry),
         TempurPedicZeroGPresetButton(coordinator, api, entry),
+        TempurPedicTVPresetButton(coordinator, api, entry),
+        TempurPedicQuietModePresetButton(coordinator, api, entry),
+        TempurPedicFavourite1PresetButton(coordinator, api, entry),
+        TempurPedicFavourite2PresetButton(coordinator, api, entry),
+        # Massage (Wave Form)
+        TempurPedicMassageHeadStrengthButton(coordinator, api, entry),
+        TempurPedicMassageFootStrengthButton(coordinator, api, entry),
+        TempurPedicMassageFreq28Button(coordinator, api, entry),
+        TempurPedicMassageFreq40Button(coordinator, api, entry),
+        TempurPedicMassageCyclePatternButton(coordinator, api, entry),
         # Wind down
         TempurPedicStopWindDownButton(coordinator, api, entry),
         # Diagnostic
@@ -108,6 +118,163 @@ class TempurPedicZeroGPresetButton(TempurPedicBaseEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         await self._api.async_preset_zero_g()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicTVPresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to position bed in TV-in-Bed preset (command 3)."""
+
+    _attr_name = "TV in bed preset"
+    _attr_icon = "mdi:television"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_preset_tv"
+
+    async def async_press(self) -> None:
+        await self._api.async_preset_tv()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicQuietModePresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to position bed in QuietMode (anti-snore) preset (command 4)."""
+
+    _attr_name = "QuietMode preset"
+    _attr_icon = "mdi:sleep"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_preset_quiet_mode"
+
+    async def async_press(self) -> None:
+        await self._api.async_preset_quiet_mode()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicFavourite1PresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to recall Favourite 1 (user-saved) preset (command 6)."""
+
+    _attr_name = "Favourite 1 preset"
+    _attr_icon = "mdi:star"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_preset_favourite_1"
+
+    async def async_press(self) -> None:
+        await self._api.async_preset_favourite_1()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicFavourite2PresetButton(TempurPedicBaseEntity, ButtonEntity):
+    """Button to recall Favourite 2 (user-saved) preset (command 9)."""
+
+    _attr_name = "Favourite 2 preset"
+    _attr_icon = "mdi:star-outline"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_preset_favourite_2"
+
+    async def async_press(self) -> None:
+        await self._api.async_preset_favourite_2()
+        await self.coordinator.async_request_refresh()
+
+
+# ---------------------------------------------------------------------------
+# Massage (Wave Form) buttons
+# ---------------------------------------------------------------------------
+
+class TempurPedicMassageHeadStrengthButton(TempurPedicBaseEntity, ButtonEntity):
+    """Step head-zone massage strength up one level (command 210)."""
+
+    _attr_name = "Head massage strength"
+    _attr_icon = "mdi:arrow-up-bold-circle-outline"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_head_strength"
+
+    async def async_press(self) -> None:
+        await self._api.async_massage_head_strength_step()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicMassageFootStrengthButton(TempurPedicBaseEntity, ButtonEntity):
+    """Step foot-zone massage strength up one level (command 211)."""
+
+    _attr_name = "Foot massage strength"
+    _attr_icon = "mdi:arrow-up-bold-circle-outline"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_foot_strength"
+
+    async def async_press(self) -> None:
+        await self._api.async_massage_foot_strength_step()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicMassageFreq28Button(TempurPedicBaseEntity, ButtonEntity):
+    """Start/switch massage to Wave Form 28 Hz (command 212)."""
+
+    _attr_name = "Massage 28 Hz"
+    _attr_icon = "mdi:sine-wave"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_freq_28hz"
+
+    async def async_press(self) -> None:
+        await self._api.async_massage_freq_28hz()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicMassageFreq40Button(TempurPedicBaseEntity, ButtonEntity):
+    """Start/switch massage to Wave Form 40 Hz (command 213)."""
+
+    _attr_name = "Massage 40 Hz"
+    _attr_icon = "mdi:sine-wave"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_freq_40hz"
+
+    async def async_press(self) -> None:
+        await self._api.async_massage_freq_40hz()
+        await self.coordinator.async_request_refresh()
+
+
+class TempurPedicMassageCyclePatternButton(TempurPedicBaseEntity, ButtonEntity):
+    """Cycle the Wave Form massage pattern (command 226)."""
+
+    _attr_name = "Massage pattern"
+    _attr_icon = "mdi:waveform"
+
+    def __init__(self, coordinator, api_client, entry: ConfigEntry) -> None:
+        super().__init__(coordinator, entry)
+        self._api = api_client
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_massage_cycle_pattern"
+
+    async def async_press(self) -> None:
+        await self._api.async_massage_cycle_pattern()
         await self.coordinator.async_request_refresh()
 
 

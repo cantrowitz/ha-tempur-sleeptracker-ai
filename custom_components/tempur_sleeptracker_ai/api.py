@@ -19,14 +19,24 @@ from .const import (
     CMD_LUMBAR_DOWN,
     CMD_LUMBAR_STOP,
     CMD_LUMBAR_UP,
+    CMD_MASSAGE_CYCLE_PATTERN,
+    CMD_MASSAGE_FOOT_STRENGTH,
+    CMD_MASSAGE_FREQ_28HZ,
+    CMD_MASSAGE_FREQ_40HZ,
+    CMD_MASSAGE_HEAD_STRENGTH,
     CMD_POLL_STATUS,
+    CMD_PRESET_FAVOURITE_1,
+    CMD_PRESET_FAVOURITE_2,
     CMD_PRESET_FLAT,
+    CMD_PRESET_QUIET_MODE,
+    CMD_PRESET_TV,
     CMD_PRESET_ZERO_G,
     CMD_STOP_WIND_DOWN,
     CMD_TOGGLE_LIGHT,
     ENDPOINT_BASE_CONTROLS,
     ENDPOINT_GET_BY_TYPE,
     ENDPOINT_WEBUI,
+    MASSAGE_ADJUSTMENT_ACTIVE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -415,6 +425,78 @@ class TempurPedicApiClient:
     async def async_preset_zero_g(self) -> Dict[str, Any]:
         """Move base to Zero-G preset (Command 0)."""
         return await self.async_send_command(CMD_PRESET_ZERO_G, request_status=False)
+
+    async def async_preset_tv(self) -> Dict[str, Any]:
+        """Move base to TV-in-Bed preset (Command 3)."""
+        return await self.async_send_command(CMD_PRESET_TV, request_status=False)
+
+    async def async_preset_quiet_mode(self) -> Dict[str, Any]:
+        """Move base to QuietMode (anti-snore) preset (Command 4)."""
+        return await self.async_send_command(CMD_PRESET_QUIET_MODE, request_status=False)
+
+    async def async_preset_favourite_1(self) -> Dict[str, Any]:
+        """Move base to Favourite 1 (user-saved) preset (Command 6)."""
+        return await self.async_send_command(CMD_PRESET_FAVOURITE_1, request_status=False)
+
+    async def async_preset_favourite_2(self) -> Dict[str, Any]:
+        """Move base to Favourite 2 (user-saved) preset (Command 9)."""
+        return await self.async_send_command(CMD_PRESET_FAVOURITE_2, request_status=False)
+
+    # ------------------------------------------------------------------
+    # Massage (Wave Form). All captured massage commands carried
+    # massageAdjustment = 1 and requestStatus = true.
+    # ------------------------------------------------------------------
+
+    async def async_massage_head_strength_step(self) -> Dict[str, Any]:
+        """Step head-zone massage strength up (Command 210; +2 per press
+        in captures: 4 -> 6 -> 8). Wrap/off behaviour past the top step is
+        not yet captured, so this is a step button, not a switch."""
+        return await self.async_send_command(
+            CMD_MASSAGE_HEAD_STRENGTH,
+            massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
+            request_status=True,
+        )
+
+    async def async_massage_foot_strength_step(self) -> Dict[str, Any]:
+        """Step foot-zone massage strength up (Command 211; +2 per press)."""
+        return await self.async_send_command(
+            CMD_MASSAGE_FOOT_STRENGTH,
+            massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
+            request_status=True,
+        )
+
+    async def async_massage_freq_28hz(self) -> Dict[str, Any]:
+        """Start/switch massage to Wave Form 28 Hz (Command 212).
+
+        Capture behaviour: both zones at strength 4, pattern 0, and the
+        30-minute massage timer restarts."""
+        return await self.async_send_command(
+            CMD_MASSAGE_FREQ_28HZ,
+            massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
+            request_status=True,
+        )
+
+    async def async_massage_freq_40hz(self) -> Dict[str, Any]:
+        """Start/switch massage to Wave Form 40 Hz (Command 213).
+
+        Capture behaviour: both zones at strength 4, pattern 0, and the
+        30-minute massage timer restarts."""
+        return await self.async_send_command(
+            CMD_MASSAGE_FREQ_40HZ,
+            massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
+            request_status=True,
+        )
+
+    async def async_massage_cycle_pattern(self) -> Dict[str, Any]:
+        """Cycle the Wave Form massage pattern (Command 226).
+
+        Captures showed the snapshot pattern stepping 1 -> 2 -> 3 across
+        presses; what the press after pattern 3 does is not yet captured."""
+        return await self.async_send_command(
+            CMD_MASSAGE_CYCLE_PATTERN,
+            massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
+            request_status=True,
+        )
 
     async def async_start_wind_down(self, command_id: int, massage_adjustment: int = 0) -> Dict[str, Any]:
         """Start a wind down preset program."""

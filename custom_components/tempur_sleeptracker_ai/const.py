@@ -52,10 +52,33 @@ CMD_LUMBAR_DOWN = 115
 CMD_LUMBAR_STOP = 106
 
 # Other commands
-CMD_PRESET_ZERO_G  = 0
-CMD_PRESET_FLAT    = 2
+#
+# Preset commands (verified from app captures, Adam, 2026-10-27):
+#   0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode | 6 Favourite 1 | 9 Favourite 2
+# Codes 1, 5, 7 and 8 are unassigned as far as we know — do not guess them.
+CMD_PRESET_ZERO_G     = 0
+CMD_PRESET_FLAT       = 2
+CMD_PRESET_TV         = 3
+CMD_PRESET_QUIET_MODE = 4
+CMD_PRESET_FAVOURITE_1 = 6
+CMD_PRESET_FAVOURITE_2 = 9
 CMD_TOGGLE_LIGHT   = 230
 CMD_POLL_STATUS    = 500
+
+# Massage commands (verified from app captures, Adam, 2026-10-27).
+# Every captured massage command carried massageAdjustment = 1.
+#   210: head zone strength step (+2 per press in captures: 4 -> 6 -> 8)
+#   211: foot zone strength step (+2 per press)
+#   212: Wave Form 28 Hz — resets both zones to strength 4, pattern 0,
+#        and restarts the 30-minute massage timer
+#   213: Wave Form 40 Hz — same, at 40 Hz
+#   226: cycle Wave Form pattern (snapshot pattern went 1 -> 2 -> 3)
+CMD_MASSAGE_HEAD_STRENGTH = 210
+CMD_MASSAGE_FOOT_STRENGTH = 211
+CMD_MASSAGE_FREQ_28HZ     = 212
+CMD_MASSAGE_FREQ_40HZ     = 213
+CMD_MASSAGE_CYCLE_PATTERN = 226
+MASSAGE_ADJUSTMENT_ACTIVE = 1
 
 # Wind Down Program Definitions
 CMD_STOP_WIND_DOWN = 31

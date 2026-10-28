@@ -44,6 +44,8 @@ async def async_setup_entry(
         TempurPedicWindDownStatusSensor(coordinator, entry),
         TempurPedicMassageFrequencySensor(coordinator, entry),
         TempurPedicMassageTimerSensor(coordinator, entry),
+        TempurPedicHeadMassageStrengthSensor(coordinator, entry),
+        TempurPedicFootMassageStrengthSensor(coordinator, entry),
         TempurPedicHeadPulseSensor(coordinator, entry),
         TempurPedicFootPulseSensor(coordinator, entry),
 
@@ -178,6 +180,46 @@ class TempurPedicMassageTimerSensor(TempurPedicBaseEntity, SensorEntity):
         """Return remaining massage timer in minutes."""
         data = self.coordinator.data or {}
         return data.get("massage_timer_mins", 0)
+
+
+class TempurPedicHeadMassageStrengthSensor(TempurPedicBaseEntity, SensorEntity):
+    """Sensor reporting head-zone massage strength (snapshot value)."""
+
+    _attr_name = "Head massage strength"
+    _attr_icon = "mdi:vibrate"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_head_massage_strength"
+
+    @property
+    def native_value(self) -> int:
+        """Return head-zone massage strength."""
+        data = self.coordinator.data or {}
+        return data.get("head_massage_strength", 0)
+
+
+class TempurPedicFootMassageStrengthSensor(TempurPedicBaseEntity, SensorEntity):
+    """Sensor reporting foot-zone massage strength (snapshot value)."""
+
+    _attr_name = "Foot massage strength"
+    _attr_icon = "mdi:vibrate"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator, entry: ConfigEntry) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry)
+        serial = entry.data.get(CONF_PROCESSOR_SERIAL, entry.entry_id)
+        self._attr_unique_id = f"{serial}_foot_massage_strength"
+
+    @property
+    def native_value(self) -> int:
+        """Return foot-zone massage strength."""
+        data = self.coordinator.data or {}
+        return data.get("foot_massage_strength", 0)
 
 
 class TempurPedicHeadPulseSensor(TempurPedicBaseEntity, SensorEntity):

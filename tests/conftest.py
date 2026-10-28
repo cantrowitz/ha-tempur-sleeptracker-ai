@@ -69,8 +69,28 @@ class EntityCategory(str, enum.Enum):
     DIAGNOSTIC = "diagnostic"
 
 
+class UnitOfTemperature(str, enum.Enum):
+    CELSIUS = "°C"
+    FAHRENHEIT = "°F"
+
+
+class UnitOfTime(str, enum.Enum):
+    MINUTES = "min"
+    SECONDS = "s"
+    HOURS = "h"
+
+
 _module("homeassistant")
-_module("homeassistant.const", Platform=Platform, EntityCategory=EntityCategory)
+_module(
+    "homeassistant.const",
+    Platform=Platform,
+    EntityCategory=EntityCategory,
+    CONCENTRATION_PARTS_PER_BILLION="ppb",
+    CONCENTRATION_PARTS_PER_MILLION="ppm",
+    PERCENTAGE="%",
+    UnitOfTemperature=UnitOfTemperature,
+    UnitOfTime=UnitOfTime,
+)
 _module("homeassistant.config_entries", ConfigEntry=type("ConfigEntry", (), {}))
 _module("homeassistant.core", HomeAssistant=type("HomeAssistant", (), {}))
 
@@ -97,6 +117,33 @@ _module(
 _module(
     "homeassistant.components.button",
     ButtonEntity=type("ButtonEntity", (), {}),
+)
+
+
+class SensorDeviceClass(str, enum.Enum):
+    """Mirror of homeassistant.components.sensor.SensorDeviceClass."""
+
+    AQI = "aqi"
+    CO = "carbon_monoxide"
+    CO2 = "carbon_dioxide"
+    HUMIDITY = "humidity"
+    TEMPERATURE = "temperature"
+    VOLATILE_ORGANIC_COMPOUNDS_PARTS = "volatile_organic_compounds_parts"
+
+
+class SensorStateClass(str, enum.Enum):
+    """Mirror of homeassistant.components.sensor.SensorStateClass."""
+
+    MEASUREMENT = "measurement"
+    TOTAL = "total"
+    TOTAL_INCREASING = "total_increasing"
+
+
+_module(
+    "homeassistant.components.sensor",
+    SensorEntity=type("SensorEntity", (), {}),
+    SensorDeviceClass=SensorDeviceClass,
+    SensorStateClass=SensorStateClass,
 )
 
 
@@ -179,6 +226,39 @@ class FakeApi:
 
     async def async_lumbar_down(self, hold_secs=None):
         self.calls.append(("lumbar_down", hold_secs))
+
+    async def async_preset_flat(self):
+        self.calls.append(("preset_flat", None))
+
+    async def async_preset_zero_g(self):
+        self.calls.append(("preset_zero_g", None))
+
+    async def async_preset_tv(self):
+        self.calls.append(("preset_tv", None))
+
+    async def async_preset_quiet_mode(self):
+        self.calls.append(("preset_quiet_mode", None))
+
+    async def async_preset_favourite_1(self):
+        self.calls.append(("preset_favourite_1", None))
+
+    async def async_preset_favourite_2(self):
+        self.calls.append(("preset_favourite_2", None))
+
+    async def async_massage_head_strength_step(self):
+        self.calls.append(("massage_head_strength", None))
+
+    async def async_massage_foot_strength_step(self):
+        self.calls.append(("massage_foot_strength", None))
+
+    async def async_massage_freq_28hz(self):
+        self.calls.append(("massage_freq_28hz", None))
+
+    async def async_massage_freq_40hz(self):
+        self.calls.append(("massage_freq_40hz", None))
+
+    async def async_massage_cycle_pattern(self):
+        self.calls.append(("massage_cycle_pattern", None))
 
 
 def make_entry(extra_data=None):
