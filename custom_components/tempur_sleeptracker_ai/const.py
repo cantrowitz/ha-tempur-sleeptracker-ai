@@ -67,8 +67,9 @@ CMD_POLL_STATUS    = 500
 
 # Massage commands (verified from app captures, Adam, 2026-10-27).
 # Every captured massage command carried massageAdjustment = 1.
-#   210: head zone strength step (+2 per press in captures: 4 -> 6 -> 8)
-#   211: foot zone strength step (+2 per press)
+#   210: head zone strength step — cycles off -> 4 -> 6 -> 8 -> off
+#        (wrap past max verified by capture, Adam, 2026-10-27)
+#   211: foot zone strength step (+2 per press; presumed same cycle)
 #   212: Wave Form 28 Hz — resets both zones to strength 4, pattern 0,
 #        and restarts the 30-minute massage timer
 #   213: Wave Form 40 Hz — same, at 40 Hz

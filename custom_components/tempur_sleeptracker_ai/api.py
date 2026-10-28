@@ -448,9 +448,13 @@ class TempurPedicApiClient:
     # ------------------------------------------------------------------
 
     async def async_massage_head_strength_step(self) -> Dict[str, Any]:
-        """Step head-zone massage strength up (Command 210; +2 per press
-        in captures: 4 -> 6 -> 8). Wrap/off behaviour past the top step is
-        not yet captured, so this is a step button, not a switch."""
+        """Step head-zone massage strength (Command 210).
+
+        The step cycles off -> 4 -> 6 -> 8 -> off: the press past 8
+        turned the zone off (verified by capture, 2026-10-27). Because
+        one press only ever advances one step, this stays a step button,
+        not a switch — a switch could not guarantee reaching a target
+        state in a single press."""
         return await self.async_send_command(
             CMD_MASSAGE_HEAD_STRENGTH,
             massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
@@ -458,7 +462,8 @@ class TempurPedicApiClient:
         )
 
     async def async_massage_foot_strength_step(self) -> Dict[str, Any]:
-        """Step foot-zone massage strength up (Command 211; +2 per press)."""
+        """Step foot-zone massage strength (Command 211; +2 per press,
+        presumed to cycle off -> 4 -> 6 -> 8 -> off like the head zone)."""
         return await self.async_send_command(
             CMD_MASSAGE_FOOT_STRENGTH,
             massage_adjustment=MASSAGE_ADJUSTMENT_ACTIVE,
