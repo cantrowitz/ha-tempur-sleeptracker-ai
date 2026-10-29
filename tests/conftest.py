@@ -74,6 +74,11 @@ class UnitOfTemperature(str, enum.Enum):
     FAHRENHEIT = "°F"
 
 
+class UnitOfRatio(str, enum.Enum):
+    PARTS_PER_MILLION = "ppm"
+    PARTS_PER_BILLION = "ppb"
+
+
 class UnitOfTime(str, enum.Enum):
     MINUTES = "min"
     SECONDS = "s"
@@ -85,9 +90,8 @@ _module(
     "homeassistant.const",
     Platform=Platform,
     EntityCategory=EntityCategory,
-    CONCENTRATION_PARTS_PER_BILLION="ppb",
-    CONCENTRATION_PARTS_PER_MILLION="ppm",
     PERCENTAGE="%",
+    UnitOfRatio=UnitOfRatio,
     UnitOfTemperature=UnitOfTemperature,
     UnitOfTime=UnitOfTime,
 )

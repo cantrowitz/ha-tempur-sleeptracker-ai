@@ -8,10 +8,9 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONCENTRATION_PARTS_PER_BILLION,
-    CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
     EntityCategory,
+    UnitOfRatio,
     UnitOfTemperature,
     UnitOfTime,
 )
@@ -412,7 +411,7 @@ class TempurPedicCo2Sensor(TempurPedicBaseEntity, SensorEntity):
 
     _attr_name = "Room CO2"
     _attr_device_class = SensorDeviceClass.CO2
-    _attr_native_unit_of_measurement = CONCENTRATION_PARTS_PER_MILLION
+    _attr_native_unit_of_measurement = UnitOfRatio.PARTS_PER_MILLION
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(self, coordinator, entry: ConfigEntry) -> None:
@@ -433,7 +432,7 @@ class TempurPedicVocSensor(TempurPedicBaseEntity, SensorEntity):
 
     _attr_name = "Room VOC"
     _attr_device_class = SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS_PARTS
-    _attr_native_unit_of_measurement = CONCENTRATION_PARTS_PER_BILLION
+    _attr_native_unit_of_measurement = UnitOfRatio.PARTS_PER_BILLION
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(self, coordinator, entry: ConfigEntry) -> None:
