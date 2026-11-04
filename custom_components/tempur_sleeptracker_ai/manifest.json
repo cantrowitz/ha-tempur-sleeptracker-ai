@@ -1,12 +1,14 @@
 {
   "domain": "tempur_sleeptracker_ai",
   "name": "Tempur-Pedic Sleeptracker-AI",
-  "codeowners": ["@cantrowitz"],
+  "codeowners": [
+    "@cantrowitz"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/cantrowitz/ha-tempur-sleeptracker-ai",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/cantrowitz/ha-tempur-sleeptracker-ai/issues",
   "requirements": [],
-  "version": "0.2.1"
+  "version": "0.2.2"
 }

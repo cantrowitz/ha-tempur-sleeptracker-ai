@@ -10,10 +10,30 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
     EntityCategory,
-    UnitOfRatio,
     UnitOfTemperature,
     UnitOfTime,
 )
+
+try:
+    # HA 2026.11+: UnitOfRatio lives in homeassistant.const.
+    from homeassistant.const import UnitOfRatio
+except ImportError:  # HA < 2026.11: fall back to the older constants.
+    # These were deprecated in favor of UnitOfRatio and are removed in
+    # HA Core 2027.8 — but on versions that new the UnitOfRatio import
+    # above succeeds, so this branch never runs there. Without this
+    # fallback the sensor platform fails to import on older HA and
+    # the integration does not load at all, even though hacs.json
+    # declares a 2024.1.0 floor.
+    from homeassistant.const import (
+        CONCENTRATION_PARTS_PER_BILLION,
+        CONCENTRATION_PARTS_PER_MILLION,
+    )
+
+    class UnitOfRatio:  # type: ignore[no-redef]
+        """Shim mirroring the UnitOfRatio members this platform uses."""
+
+        PARTS_PER_MILLION = CONCENTRATION_PARTS_PER_MILLION
+        PARTS_PER_BILLION = CONCENTRATION_PARTS_PER_BILLION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
