@@ -64,7 +64,7 @@ class TempurPedicHeadCover(TempurPedicBaseEntity, CoverEntity):
 
     _attr_name = "Head elevation"
     _attr_icon = "mdi:bed"
-    # No STOP feature on any cover (removed 2026-10-27 at Adam's request):
+    # No STOP feature on any cover (removed 2026-10-27):
     # every move here is a short nudge that stops itself, so a stop button
     # only ever appeared to do nothing. The protocol stop commands are
     # still sent internally at the end of every actuation.

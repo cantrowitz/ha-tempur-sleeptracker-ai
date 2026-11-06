@@ -53,7 +53,7 @@ CMD_LUMBAR_STOP = 106
 
 # Other commands
 #
-# Preset commands (verified from app captures, Adam, 2026-10-27):
+# Preset commands (verified from app captures, 2026-10-27):
 #   0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode | 6 Favorite 1 | 9 Favorite 2
 # (The Sleeptracker app itself labels the two saved slots "Favourite 1/2";
 #  this integration uses the US spelling.)
@@ -67,10 +67,10 @@ CMD_PRESET_FAVORITE_2 = 9
 CMD_TOGGLE_LIGHT   = 230
 CMD_POLL_STATUS    = 500
 
-# Massage commands (verified from app captures, Adam, 2026-10-27).
+# Massage commands (verified from app captures, 2026-10-27).
 # Every captured massage command carried massageAdjustment = 1.
 #   210: head zone strength step — cycles off -> 4 -> 6 -> 8 -> off
-#        (wrap past max verified by capture, Adam, 2026-10-27)
+#        (wrap past max verified by capture, 2026-10-27)
 #   211: foot zone strength step (+2 per press; presumed same cycle)
 #   212: Wave Form 28 Hz — resets both zones to strength 4, pattern 0,
 #        and restarts the 30-minute massage timer

@@ -87,7 +87,7 @@ def test_head_set_position_noop_when_already_there(head):
 
 
 def test_no_cover_advertises_stop_feature(head, foot, lumbar):
-    """Adam asked for the stop button gone (2026-10-27): every move is a
+    """The stop button was removed (2026-10-27): every move is a
     self-stopping nudge, so the button only ever appeared to do nothing.
     The covers must not advertise STOP. (The API still sends protocol
     stops at the end of each actuation — that's separate, and stays.)"""

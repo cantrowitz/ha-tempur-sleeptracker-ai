@@ -7,7 +7,7 @@ nothing, then the motor was left running UP. Head/foot "up" only worked
 by accident, because the misnamed constant happened to be the right
 stop.
 
-Verified command table (Adam, 2026-10-26):
+Verified command table (2026-10-26):
 
     Head:   up 110 -> stop 107 | down 111 -> stop 107
     Foot:   up 112 -> stop 108 | down 113 -> stop 108

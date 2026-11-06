@@ -215,7 +215,7 @@ class TempurPedicMassageFrequencySettingSensor(TempurPedicBaseEntity, SensorEnti
         return {"raw_hz": data.get("massage_frequency_hz")}
 
 
-# Snapshot massagePattern semantics (Adam's app captures, 2026-10-27):
+# Snapshot massagePattern semantics (app captures, 2026-10-27):
 #   0 = massage running steady, no wave pattern (the state the 28/40 Hz
 #       frequency commands leave behind)
 #   1-3 = Wave Form pattern selected by the pattern-cycle command (226)

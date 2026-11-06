@@ -1,6 +1,6 @@
 """Preset and massage command tests.
 
-Command table verified from Sleeptracker app captures (Adam, 2026-10-27):
+Command table verified from Sleeptracker app captures (2026-10-27):
 
     Presets (massageAdjustment 0, requestStatus false):
         0 Zero-G | 2 Flat | 3 TV-in-Bed | 4 QuietMode
@@ -174,7 +174,7 @@ def test_massage_strength_sensors():
 
 # ---------------------------------------------------------------------------
 # Massage status sensors: pattern and frequency as readable states
-# (snapshot semantics from Adam's captures, 2026-10-27: pattern 0 =
+# (snapshot semantics from app captures, 2026-10-27: pattern 0 =
 # steady, 1-3 = Wave Form pattern, 4 = off; frequency 0 = off)
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize(

@@ -1,6 +1,6 @@
 """Tests for async_get_bed_status parsing of the command-500 response.
 
-The fixture shape is taken verbatim from a real capture (Adam's Ergo
+The fixture shape is taken verbatim from a real capture (the tested Ergo
 ProSmart base, Oct 27 2026): command 500 returns connectionStatus,
 invariants (hardware capability roster) and snapshots (live state).
 """
